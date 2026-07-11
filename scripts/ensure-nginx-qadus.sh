@@ -20,8 +20,17 @@ run_sudo() {
   fi
 }
 
+cleanup_sites_enabled_junk() {
+  echo "=== Nettoyage sites-enabled (fichiers .disabled*) ==="
+  while IFS= read -r _f; do
+    [ -n "$_f" ] || continue
+    run_sudo rm -f "$_f"
+    echo "Supprimé : $_f"
+  done < <(run_sudo find /etc/nginx/sites-enabled -maxdepth 1 -name '*.disabled*' 2>/dev/null || true)
+}
+
 disable_foreign_qadus_configs() {
-  local _f _real _target
+  local _f _real _target _name _archived
   _real="$(run_sudo readlink -f "$DEST" 2>/dev/null || echo "$DEST")"
 
   echo "=== Désactivation des configs qadus.fr en double ==="
@@ -32,10 +41,20 @@ disable_foreign_qadus_configs() {
       continue
     fi
     if run_sudo grep -qE 'server_name[^;]*(qadus\.fr|www\.qadus\.fr)' "$_f" 2>/dev/null; then
-      run_sudo mv -f "$_f" "${_f}.disabled-by-qadus-deploy" 2>/dev/null || run_sudo rm -f "$_f"
-      echo "Désactivé : $_f"
+      if [[ "$_f" == */sites-enabled/* ]]; then
+        run_sudo rm -f "$_f"
+        echo "Symlink supprimé : $_f"
+      else
+        _name="$(basename "$_f")"
+        _archived="/etc/nginx/sites-available/${_name}.disabled-by-qadus-deploy"
+        run_sudo mv -f "$_f" "$_archived" 2>/dev/null || run_sudo rm -f "$_f"
+        echo "Archivé : $_f → $_archived"
+      fi
     fi
-  done < <(run_sudo find /etc/nginx -type f \( -name '*.conf' -o -path '*/sites-enabled/*' \) 2>/dev/null || true)
+  done < <(
+    run_sudo find /etc/nginx/sites-enabled -maxdepth 1 \( -type f -o -type l \) 2>/dev/null || true
+    run_sudo find /etc/nginx/sites-available /etc/nginx/conf.d -type f -name '*.conf' 2>/dev/null || true
+  )
 }
 
 write_site_config() {
@@ -75,17 +94,21 @@ server {
 EOF
 
   if [ -n "$cert_dir" ]; then
+    local ssl_dhparam_line=""
+    if run_sudo test -f /etc/letsencrypt/ssl-dhparams.pem 2>/dev/null; then
+      ssl_dhparam_line="    ssl_dhparam /etc/letsencrypt/ssl-dhparams.pem;"
+    fi
     cat >>"$tmp" <<EOF
 
 server {
-    listen 443 ssl http2;
-    listen [::]:443 ssl http2;
+    listen 443 ssl;
+    listen [::]:443 ssl;
     server_name qadus.fr www.qadus.fr;
 
     ssl_certificate ${cert_dir}/fullchain.pem;
     ssl_certificate_key ${cert_dir}/privkey.pem;
     include /etc/letsencrypt/options-ssl-nginx.conf;
-    ssl_dhparam /etc/letsencrypt/ssl-dhparams.pem;
+${ssl_dhparam_line}
 
     client_max_body_size 10M;
 
@@ -160,6 +183,34 @@ print_active_nginx_config() {
   run_sudo nginx -T 2>/dev/null | grep -E 'server_name|proxy_pass|127\.0\.0\.1:300' | head -60 || true
 }
 
+reload_or_restart_nginx() {
+  echo "=== Test nginx -t ==="
+  if ! run_sudo nginx -t 2>&1; then
+    echo "::error::nginx -t a échoué après mise à jour Qadus"
+    return 1
+  fi
+
+  echo "=== Rechargement nginx ==="
+  if run_sudo systemctl is-active nginx >/dev/null 2>&1; then
+    if run_sudo systemctl reload nginx 2>&1; then
+      echo "=== nginx rechargé (reload) ==="
+      return 0
+    fi
+    echo "reload échoué, tentative restart..."
+  fi
+
+  if run_sudo systemctl restart nginx 2>&1; then
+    echo "=== nginx redémarré (restart) ==="
+    return 0
+  fi
+
+  echo "::error::nginx reload/restart a échoué"
+  run_sudo systemctl status nginx --no-pager 2>&1 || true
+  run_sudo journalctl -u nginx.service -n 30 --no-pager 2>&1 || true
+  run_sudo nginx -t 2>&1 || true
+  return 1
+}
+
 if ! command -v nginx >/dev/null 2>&1; then
   echo "nginx absent — rien à configurer"
   exit 0
@@ -167,20 +218,13 @@ fi
 
 echo "=== Configuration nginx Qadus → ${PROXY_TARGET} ==="
 
+cleanup_sites_enabled_junk
 disable_foreign_qadus_configs
 write_site_config
 
-echo "=== Test nginx -t ==="
-if ! run_sudo nginx -t 2>&1; then
-  echo "::error::nginx -t a échoué après mise à jour Qadus"
+if ! reload_or_restart_nginx; then
   exit 1
 fi
-
-echo "=== Redémarrage nginx (restart) ==="
-if ! run_sudo systemctl restart nginx 2>&1; then
-  run_sudo service nginx restart 2>&1
-fi
-echo "=== nginx redémarré ==="
 
 print_active_nginx_config
 
