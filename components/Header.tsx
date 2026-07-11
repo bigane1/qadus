@@ -3,9 +3,7 @@
 import { useState, useEffect } from "react";
 import Link from "next/link";
 import Image from "next/image";
-
-const TEL = "0761916222";
-const TEL_DISPLAY = "07 61 91 62 22";
+import { TEL_DISPLAY, telHref } from "@/lib/contact";
 
 const navLinks = [
   { href: "/debouchage", label: "Débouchage" },
@@ -40,7 +38,7 @@ export default function Header() {
         <div className="flex items-center justify-between h-16 lg:h-18">
           {/* Logo */}
           <Link href="/" className="flex items-center gap-2 flex-shrink-0">
-            <Image src="/logo.png" alt="Qadus" width={120} height={40} className="h-10 w-auto" priority />
+            <Image src="/logo.png" alt="Qadus" width={120} height={40} style={{ width: "auto", height: "40px" }} priority />
           </Link>
 
           {/* Nav desktop */}
@@ -65,7 +63,7 @@ export default function Header() {
               Devis gratuit
             </Link>
           <a
-            href={`tel:+33${TEL.substring(1)}`}
+            href={telHref}
             className="flex items-center gap-2 bg-orange-500 hover:bg-orange-600 text-white font-bold px-4 py-2.5 rounded-xl transition-all hover:-translate-y-0.5 hover:shadow-lg hover:shadow-orange-200 text-sm lg:text-base"
           >
             <span className="text-base">📞</span>
@@ -114,7 +112,7 @@ export default function Header() {
             📋 Devis gratuit
           </Link>
           <a
-            href={`tel:+33${TEL.substring(1)}`}
+            href={telHref}
             className="mt-2 flex items-center justify-center gap-2 bg-orange-500 text-white font-bold py-3 rounded-xl"
           >
             📞 {TEL_DISPLAY}

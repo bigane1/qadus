@@ -2,10 +2,7 @@ import Link from "next/link";
 import Header from "./Header";
 import Footer from "./Footer";
 import FloatingCTA from "./FloatingCTA";
-
-const TEL = "0761916222";
-const TEL_DISPLAY = "07 61 91 62 22";
-const WHATSAPP_NUMBER = "33761916222";
+import { TEL_DISPLAY, telHref, whatsappHref } from "@/lib/contact";
 
 interface Faq {
   q: string;
@@ -56,14 +53,14 @@ export default function ServicePageLayout({
             </p>
             <div className="flex flex-col sm:flex-row gap-4 justify-center">
               <a
-                href={`tel:+33${TEL.substring(1)}`}
+                href={telHref}
                 className="flex items-center justify-center gap-3 bg-orange-500 hover:bg-orange-600 text-white font-black px-8 py-4 rounded-2xl text-lg transition-all hover:-translate-y-1 hover:shadow-xl hover:shadow-orange-500/40"
               >
                 <span className="text-2xl">📞</span>
                 {TEL_DISPLAY} — Appel gratuit
               </a>
               <a
-                href={`https://wa.me/${WHATSAPP_NUMBER}?text=Bonjour%20Qadus%2C%20j%27ai%20besoin%20d%27un%20devis%20pour%20`}
+                href={whatsappHref("Bonjour Qadus, j'ai besoin d'un devis pour ")}
                 target="_blank"
                 rel="noopener noreferrer"
                 className="flex items-center justify-center gap-3 bg-green-500 hover:bg-green-600 text-white font-bold px-8 py-4 rounded-2xl text-lg transition-all hover:-translate-y-1"
@@ -172,7 +169,7 @@ export default function ServicePageLayout({
             </p>
             <div className="flex flex-col sm:flex-row gap-4 justify-center">
               <a
-                href={`tel:+33${TEL.substring(1)}`}
+                href={telHref}
                 className="flex items-center justify-center gap-2 bg-white text-orange-600 hover:bg-orange-50 font-black px-8 py-4 rounded-2xl text-lg transition-all hover:-translate-y-0.5"
               >
                 📞 {TEL_DISPLAY}

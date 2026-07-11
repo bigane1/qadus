@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import ServicePageLayout from "@/components/ServicePageLayout";
+import { heroWide, serviceImages } from "@/lib/images";
 
 export const metadata: Metadata = {
   title: "Assainissement Île-de-France — Réseaux EU, EP, Bacs à Graisse",
@@ -110,8 +111,8 @@ export default function AssainissementPage() {
       title="Assainissement Île-de-France"
       subtitle="Bacs à graisse, postes de relevage, réseaux EU/EV/EP"
       description="Qadus est votre spécialiste assainissement en Île-de-France. Installation et entretien de bacs à graisse, postes de relevage, séparateurs hydrocarbures, diagnostics de conformité. Particuliers, restaurateurs, collectivités."
-      heroImage="https://images.unsplash.com/photo-1504307651254-35680f356dfd?w=1400&q=80&auto=format&fit=crop"
-      heroImageAlt="Technicien assainissement réseau eaux usées professionnel"
+      heroImage={heroWide(serviceImages.assainissement).src}
+      heroImageAlt={serviceImages.assainissement.alt}
       benefits={benefits}
       steps={steps}
       faqs={faqs}

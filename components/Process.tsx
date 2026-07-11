@@ -1,12 +1,11 @@
-const TEL = "0761916222";
-const TEL_DISPLAY = "07 61 91 62 22";
+import { TEL_DISPLAY, telHref } from "@/lib/contact";
 
 const steps = [
   {
     num: "01",
     icon: "📞",
     title: "Appel gratuit & Diagnostic",
-    desc: "Appelez-nous au 07 61 91 62 22. Nous évaluons votre problème par téléphone et vous communiquons une fourchette de tarif avant toute intervention. Devis gratuit sur place après diagnostic.",
+    desc: `Appelez-nous au ${TEL_DISPLAY}. Nous évaluons votre problème par téléphone et vous communiquons une fourchette de tarif avant toute intervention. Devis gratuit sur place après diagnostic.`,
     color: "from-blue-600 to-blue-700",
   },
   {
@@ -20,65 +19,53 @@ const steps = [
     num: "03",
     icon: "✅",
     title: "Résultat garanti",
-    desc: "Pas débouché = pas facturé. Si l'intervention ne donne pas satisfaction, nous revenons gratuitement. Une facture détaillée vous est remise en fin d'intervention.",
-    color: "from-green-500 to-green-600",
+    desc: "Canalisation débouchée, réseau nettoyé ou réhabilité — nous testons le résultat avant de partir. Pas débouché = pas facturé. Rapport d'intervention remis sur demande.",
+    color: "from-green-600 to-green-700",
   },
 ];
 
 export default function Process() {
   return (
-    <section id="process" className="py-20 px-4 bg-white">
+    <section className="py-20 px-4 bg-white">
       <div className="max-w-7xl mx-auto">
         <div className="text-center mb-16">
           <span className="inline-block bg-orange-100 text-orange-700 text-xs font-bold uppercase tracking-widest px-4 py-1.5 rounded-full mb-4">
             Comment ça marche
           </span>
           <h2 className="text-4xl sm:text-5xl font-black text-slate-900 mb-4">
-            3 étapes simples
+            3 étapes, zéro surprise
           </h2>
           <p className="text-lg text-slate-500 max-w-xl mx-auto">
-            De votre appel à la résolution du problème — rapide, transparent, garanti.
+            Un processus simple et transparent, du premier appel à l&apos;intervention terminée.
           </p>
         </div>
 
-        <div className="grid md:grid-cols-3 gap-8 relative">
-          {/* Connector lines */}
-          <div className="hidden md:block absolute top-16 left-[33%] right-[33%] h-0.5 bg-gradient-to-r from-blue-600 via-orange-500 to-green-500 opacity-30" />
-
-          {steps.map((step, i) => (
-            <div key={step.num} className="relative text-center">
-              {/* Number badge */}
+        <div className="grid md:grid-cols-3 gap-8 mb-12">
+          {steps.map((s) => (
+            <div
+              key={s.num}
+              className="relative bg-slate-50 border border-slate-200 rounded-2xl p-8 hover:shadow-lg hover:-translate-y-1 transition-all"
+            >
               <div
-                className={`inline-flex items-center justify-center w-16 h-16 rounded-2xl bg-gradient-to-br ${step.color} text-white text-2xl font-black mb-6 shadow-lg`}
+                className={`inline-flex items-center justify-center w-14 h-14 rounded-2xl bg-gradient-to-br ${s.color} text-white text-2xl mb-5 shadow-md`}
               >
-                {step.icon}
+                {s.icon}
               </div>
-              <div
-                className={`absolute top-0 left-1/2 -translate-x-1/2 -translate-y-1 w-6 h-6 rounded-full bg-gradient-to-br ${step.color} text-white text-xs font-black flex items-center justify-center`}
-              >
-                {i + 1}
+              <div className="text-xs font-black text-slate-400 uppercase tracking-widest mb-2">
+                Étape {s.num}
               </div>
-
-              <h3 className="text-xl font-bold text-slate-900 mb-3">{step.title}</h3>
-              <p className="text-slate-500 leading-relaxed text-sm">{step.desc}</p>
+              <h3 className="text-xl font-bold text-slate-900 mb-3">{s.title}</h3>
+              <p className="text-slate-500 text-sm leading-relaxed">{s.desc}</p>
             </div>
           ))}
         </div>
 
-        {/* Bottom CTA */}
-        <div className="mt-16 bg-gradient-to-r from-slate-900 to-blue-950 rounded-3xl p-8 sm:p-10 text-center">
-          <h3 className="text-2xl sm:text-3xl font-black text-white mb-3">
-            Prêt à intervenir maintenant
-          </h3>
-          <p className="text-slate-400 mb-6">
-            Un seul appel suffit. Devis gratuit — pas de surprise sur la facture.
-          </p>
+        <div className="text-center">
           <a
-            href={`tel:+33${TEL.substring(1)}`}
-            className="inline-flex items-center gap-3 bg-orange-500 hover:bg-orange-600 text-white font-bold text-lg px-8 py-4 rounded-2xl transition-all hover:-translate-y-1 hover:shadow-2xl hover:shadow-orange-500/40"
+            href={telHref}
+            className="inline-flex items-center gap-3 bg-orange-500 hover:bg-orange-600 text-white font-bold text-lg px-8 py-4 rounded-2xl transition-all hover:-translate-y-1 hover:shadow-xl hover:shadow-orange-500/30"
           >
-            <span className="text-2xl">📞</span>
-            {TEL_DISPLAY} — Appel gratuit
+            📞 {TEL_DISPLAY} — Appel gratuit
           </a>
         </div>
       </div>

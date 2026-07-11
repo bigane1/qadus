@@ -3,6 +3,7 @@ import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import FloatingCTA from "@/components/FloatingCTA";
 import Link from "next/link";
+import { TEL_DISPLAY, telHref, whatsappHref } from "@/lib/contact";
 
 export const metadata: Metadata = {
   title: "Devis Gratuit Plomberie & Débouchage Île-de-France — Qadus",
@@ -22,10 +23,6 @@ export const metadata: Metadata = {
     url: "https://www.qadus.fr/devis",
   },
 };
-
-const TEL = "0761916222";
-const TEL_DISPLAY = "07 61 91 62 22";
-const WHATSAPP_NUMBER = "33761916222";
 
 const services = [
   { href: "/debouchage", icon: "🚿", label: "Débouchage / Dégorgement", desc: "Évier, WC, douche, réseau bouché" },
@@ -100,7 +97,7 @@ export default function DevisPage() {
             </p>
             <div className="grid sm:grid-cols-3 gap-4 mb-10">
               <a
-                href={`tel:+33${TEL.substring(1)}`}
+                href={telHref}
                 className="flex flex-col items-center gap-3 bg-orange-50 border-2 border-orange-200 hover:border-orange-400 hover:bg-orange-100 rounded-2xl p-6 text-center transition-all group"
               >
                 <span className="text-4xl">📞</span>
@@ -110,7 +107,7 @@ export default function DevisPage() {
                 </div>
               </a>
               <a
-                href={`https://wa.me/${WHATSAPP_NUMBER}?text=Bonjour%20Qadus%2C%20je%20voudrais%20un%20devis%20pour%20`}
+                href={whatsappHref("Bonjour Qadus, je voudrais un devis pour ")}
                 target="_blank"
                 rel="noopener noreferrer"
                 className="flex flex-col items-center gap-3 bg-green-50 border-2 border-green-200 hover:border-green-400 hover:bg-green-100 rounded-2xl p-6 text-center transition-all"

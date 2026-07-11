@@ -1,7 +1,5 @@
 import Link from "next/link";
-
-const TEL = "0761916222";
-const TEL_DISPLAY = "07 61 91 62 22";
+import { TEL_DISPLAY, telHref } from "@/lib/contact";
 
 const currentYear = new Date().getFullYear();
 
@@ -43,7 +41,7 @@ export default function Footer() {
           </p>
           <div className="space-y-2">
             <a
-              href={`tel:+33${TEL.substring(1)}`}
+              href={telHref}
               className="flex items-center gap-2 text-orange-400 hover:text-orange-300 font-bold transition-colors"
             >
               📞 {TEL_DISPLAY}
@@ -109,7 +107,7 @@ export default function Footer() {
               Canalisation bouchée ? Fuite d&apos;eau ? Appelez maintenant :
             </p>
             <a
-              href={`tel:+33${TEL.substring(1)}`}
+              href={telHref}
               className="block bg-orange-500 hover:bg-orange-600 text-white font-black py-3 px-4 rounded-xl transition-all hover:-translate-y-0.5 text-lg"
             >
               {TEL_DISPLAY}

@@ -1,12 +1,7 @@
 "use client";
 
 import { useState } from "react";
-
-const TEL = "0632984629";
-const TEL_DISPLAY = "06 32 98 46 29";
-const TEL_2 = "0189278927";
-const TEL_2_DISPLAY = "01 89 27 89 27";
-const WHATSAPP_NUMBER = "33632984629";
+import { TEL_DISPLAY, telHref, whatsappHref } from "@/lib/contact";
 
 const services = [
   "Débouchage / Dégorgement",
@@ -84,21 +79,14 @@ export default function Contact() {
                 icon: "📞",
                 label: "Urgence & Devis",
                 value: TEL_DISPLAY,
-                href: `tel:+33${TEL.substring(1)}`,
+                href: telHref,
                 sub: "Disponible 24h/24 — 7j/7",
-              },
-              {
-                icon: "📞",
-                label: "Ligne secondaire",
-                value: TEL_2_DISPLAY,
-                href: `tel:+33${TEL_2.substring(1)}`,
-                sub: "Lun–Sam 8h–20h",
               },
               {
                 icon: "💬",
                 label: "WhatsApp",
                 value: "WhatsApp — Réponse rapide",
-                href: `https://wa.me/${WHATSAPP_NUMBER}?text=Bonjour%20Qadus%2C%20j%27ai%20besoin%20d%27un%20devis%20pour%20`,
+                href: whatsappHref(),
                 sub: "Envoyez vos photos / vidéos",
               },
               {
@@ -156,7 +144,7 @@ export default function Contact() {
                   Nous vous répondons dans les 2 heures. Pour une urgence,
                   appelez directement le{" "}
                   <a
-                    href={`tel:+33${TEL.substring(1)}`}
+                    href={telHref}
                     className="text-orange-500 font-bold"
                   >
                     {TEL_DISPLAY}

@@ -1,5 +1,4 @@
-const TEL = "0761916222";
-const TEL_DISPLAY = "07 61 91 62 22";
+import { TEL_DISPLAY, telHref } from "@/lib/contact";
 
 export default function UrgenceBand() {
   return (
@@ -16,7 +15,7 @@ export default function UrgenceBand() {
         </div>
         <span className="hidden sm:block text-red-200">—</span>
         <a
-          href={`tel:+33${TEL.substring(1)}`}
+          href={telHref}
           className="text-2xl font-black tracking-wide border-b-2 border-white/60 hover:border-white transition-colors"
         >
           {TEL_DISPLAY}

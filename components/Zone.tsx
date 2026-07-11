@@ -1,5 +1,4 @@
-const TEL = "0761916222";
-const TEL_DISPLAY = "07 61 91 62 22";
+import { TEL_DISPLAY, telHref } from "@/lib/contact";
 
 const departements = [
   {
@@ -147,7 +146,7 @@ export default function Zone() {
             Nous intervenons dans toute l&apos;Île-de-France. Appelez-nous pour vérifier.
           </p>
           <a
-            href={`tel:+33${TEL.substring(1)}`}
+            href={telHref}
             className="inline-flex items-center gap-2 bg-orange-500 hover:bg-orange-600 text-white font-bold px-6 py-3 rounded-xl transition-all hover:-translate-y-0.5 hover:shadow-lg hover:shadow-orange-200"
           >
             📞 {TEL_DISPLAY} — Appel gratuit

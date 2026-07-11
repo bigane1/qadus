@@ -1,3 +1,5 @@
+import { TEL_DISPLAY, TEL_E164 } from "./contact";
+
 export const localBusinessSchema = {
   "@context": "https://schema.org",
   "@type": "Plumber",
@@ -7,7 +9,7 @@ export const localBusinessSchema = {
   image: "https://www.qadus.fr/og-image.jpg",
   description:
     "Qadus — Spécialiste débouchage, assainissement et réhabilitation de canalisations en Île-de-France. Chemisage sans tranchée, inspection caméra, curage, hydrocurage, bacs à graisse, postes de relevage. Intervention 24h/24 7j/7.",
-  telephone: "+33761916222",
+  telephone: TEL_E164,
   email: "qadus.paris@gmail.com",
   vatID: "FR99990840019",
   taxID: "990 840 019",
@@ -81,7 +83,7 @@ export const faqSchema = {
       name: "Intervenez-vous en urgence la nuit et le week-end ?",
       acceptedAnswer: {
         "@type": "Answer",
-        text: "Oui, Qadus est disponible 24h/24 et 7j/7, y compris les nuits, week-ends et jours fériés. Un seul numéro : 07 61 91 62 22. Appelez et nous intervenons dans les plus brefs délais.",
+        text: `Oui, Qadus est disponible 24h/24 et 7j/7, y compris les nuits, week-ends et jours fériés. Un seul numéro : ${TEL_DISPLAY}. Appelez et nous intervenons dans les plus brefs délais.`,
       },
     },
     {
@@ -105,7 +107,7 @@ export const faqSchema = {
       name: "Que faire si ma canalisation est bouchée ?",
       acceptedAnswer: {
         "@type": "Answer",
-        text: "Appelez-nous immédiatement au 07 61 91 62 22. Nos techniciens interviennent avec furet mécanique, hydrocurage haute pression ou caméra endoscopique selon la nature du bouchon.",
+        text: `Appelez-nous immédiatement au ${TEL_DISPLAY}. Nos techniciens interviennent avec furet mécanique, hydrocurage haute pression ou caméra endoscopique selon la nature du bouchon.`,
       },
     },
     {
