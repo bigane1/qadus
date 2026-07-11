@@ -1,13 +1,16 @@
 #!/usr/bin/env bash
-# Configure nginx pour qadus.fr → 127.0.0.1:3002 (HTTP + HTTPS si certificat Let's Encrypt)
+# Configure nginx pour qadus.fr → 127.0.0.1:3002
+# Supporte aaPanel/BT Panel (/www/server/nginx) et nginx Debian (/etc/nginx).
 set -euo pipefail
 
 ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
-SITE_NAME="qadus"
-DEST="/etc/nginx/sites-available/$SITE_NAME"
-ENABLED="/etc/nginx/sites-enabled/$SITE_NAME"
 QADUS_PORT=3002
 PROXY_TARGET="http://127.0.0.1:${QADUS_PORT}"
+
+NGINX_MODE="debian"
+NGINX_BIN="nginx"
+NGINX_CONF=""
+NGINX_MASTER_PATTERN="nginx: master process"
 
 run_sudo() {
   if [ "$(id -u)" -eq 0 ]; then
@@ -20,45 +23,67 @@ run_sudo() {
   fi
 }
 
-cleanup_sites_enabled_junk() {
-  echo "=== Nettoyage sites-enabled (fichiers .disabled*) ==="
-  while IFS= read -r _f; do
-    [ -n "$_f" ] || continue
-    run_sudo rm -f "$_f"
-    echo "Supprimé : $_f"
-  done < <(run_sudo find /etc/nginx/sites-enabled -maxdepth 1 -name '*.disabled*' 2>/dev/null || true)
+detect_nginx_env() {
+  if [ -x /www/server/nginx/sbin/nginx ]; then
+    NGINX_MODE="aapanel"
+    NGINX_BIN="/www/server/nginx/sbin/nginx"
+    NGINX_CONF="/www/server/nginx/conf/nginx.conf"
+    NGINX_MASTER_PATTERN="/www/server/nginx/sbin/nginx"
+    echo "=== Environnement détecté : aaPanel (/www/server/nginx) ==="
+    return 0
+  fi
+  if command -v nginx >/dev/null 2>&1; then
+    NGINX_MODE="debian"
+    NGINX_BIN="nginx"
+    NGINX_CONF=""
+    NGINX_MASTER_PATTERN="nginx: master process"
+    echo "=== Environnement détecté : nginx Debian (/etc/nginx) ==="
+    return 0
+  fi
+  echo "nginx absent — rien à configurer"
+  return 1
 }
 
-disable_foreign_qadus_configs() {
-  local _f _real _target _name _archived
-  _real="$(run_sudo readlink -f "$DEST" 2>/dev/null || echo "$DEST")"
-
-  echo "=== Désactivation des configs qadus.fr en double ==="
-  while IFS= read -r _f; do
-    [ -n "$_f" ] || continue
-    _target="$(run_sudo readlink -f "$_f" 2>/dev/null || echo "$_f")"
-    if [ "$_target" = "$_real" ]; then
-      continue
-    fi
-    if run_sudo grep -qE 'server_name[^;]*(qadus\.fr|www\.qadus\.fr)' "$_f" 2>/dev/null; then
-      if [[ "$_f" == */sites-enabled/* ]]; then
-        run_sudo rm -f "$_f"
-        echo "Symlink supprimé : $_f"
-      else
-        _name="$(basename "$_f")"
-        _archived="/etc/nginx/sites-available/${_name}.disabled-by-qadus-deploy"
-        run_sudo mv -f "$_f" "$_archived" 2>/dev/null || run_sudo rm -f "$_f"
-        echo "Archivé : $_f → $_archived"
-      fi
-    fi
-  done < <(
-    run_sudo find /etc/nginx/sites-enabled -maxdepth 1 \( -type f -o -type l \) 2>/dev/null || true
-    run_sudo find /etc/nginx/sites-available /etc/nginx/conf.d -type f -name '*.conf' 2>/dev/null || true
-  )
+patch_proxy_in_file() {
+  local _f="$1"
+  [ -n "$_f" ] || return 0
+  run_sudo grep -qE 'qadus\.fr|www\.qadus\.fr|proxy_pass' "$_f" 2>/dev/null || return 0
+  run_sudo sed -i -E \
+    "s#proxy_pass[[:space:]]+https?://(127\\.0\\.0\\.1|localhost):[0-9]+/?#proxy_pass ${PROXY_TARGET}#g" \
+    "$_f"
+  run_sudo sed -i -E \
+    "s#proxy_pass[[:space:]]+https?://[^;]+:([0-9]+)/?#proxy_pass ${PROXY_TARGET}#g" \
+    "$_f" 2>/dev/null || true
+  run_sudo sed -i -E \
+    "s#server[[:space:]]+(127\\.0\\.0\\.1|localhost):[0-9]+;#server 127.0.0.1:${QADUS_PORT};#g" \
+    "$_f"
+  echo "→ proxy mis à jour : $_f"
 }
 
-write_site_config() {
-  local cert_dir=""
+patch_aapanel_qadus_vhosts() {
+  local _dir _f _found=0
+  echo "=== Patch vhosts aaPanel (qadus.fr → ${QADUS_PORT}) ==="
+  for _dir in \
+    /www/server/panel/vhost/nginx \
+    /www/server/nginx/conf/vhost \
+    /www/server/panel/vhost/nginx/extension; do
+    [ -d "$_dir" ] || continue
+    while IFS= read -r _f; do
+      [ -n "$_f" ] || continue
+      patch_proxy_in_file "$_f"
+      _found=1
+    done < <(run_sudo grep -rlE 'qadus\.fr|www\.qadus\.fr' "$_dir" 2>/dev/null || true)
+  done
+  if [ "$_found" -eq 0 ]; then
+    echo "⚠ Aucun vhost aaPanel qadus.fr trouvé — recherche globale..."
+    while IFS= read -r _f; do
+      patch_proxy_in_file "$_f"
+    done < <(run_sudo grep -rlE 'qadus\.fr|www\.qadus\.fr' /www/server/panel/vhost /www/server/nginx/conf 2>/dev/null || true)
+  fi
+}
+
+write_debian_site_config() {
+  local cert_dir="" DEST="/etc/nginx/sites-available/qadus" ENABLED="/etc/nginx/sites-enabled/qadus"
   if run_sudo test -f /etc/letsencrypt/live/qadus.fr/fullchain.pem 2>/dev/null; then
     cert_dir="/etc/letsencrypt/live/qadus.fr"
   elif run_sudo test -f /etc/letsencrypt/live/www.qadus.fr/fullchain.pem 2>/dev/null; then
@@ -67,18 +92,14 @@ write_site_config() {
 
   local tmp
   tmp="$(mktemp)"
-
   cat >"$tmp" <<EOF
 # Qadus — reverse proxy nginx vers Next.js (PM2, port ${QADUS_PORT})
-# Généré par scripts/ensure-nginx-qadus.sh
 
 server {
     listen 80;
     listen [::]:80;
     server_name qadus.fr www.qadus.fr;
-
     client_max_body_size 10M;
-
     location / {
         proxy_http_version 1.1;
         proxy_set_header Host \$host;
@@ -92,26 +113,17 @@ server {
     }
 }
 EOF
-
   if [ -n "$cert_dir" ]; then
-    local ssl_dhparam_line=""
-    if run_sudo test -f /etc/letsencrypt/ssl-dhparams.pem 2>/dev/null; then
-      ssl_dhparam_line="    ssl_dhparam /etc/letsencrypt/ssl-dhparams.pem;"
-    fi
     cat >>"$tmp" <<EOF
 
 server {
     listen 443 ssl;
     listen [::]:443 ssl;
     server_name qadus.fr www.qadus.fr;
-
     ssl_certificate ${cert_dir}/fullchain.pem;
     ssl_certificate_key ${cert_dir}/privkey.pem;
     include /etc/letsencrypt/options-ssl-nginx.conf;
-${ssl_dhparam_line}
-
     client_max_body_size 10M;
-
     location / {
         proxy_http_version 1.1;
         proxy_set_header Host \$host;
@@ -125,72 +137,22 @@ ${ssl_dhparam_line}
     }
 }
 EOF
-    echo "Certificat SSL détecté : $cert_dir"
-  else
-    echo "Pas de certificat Let's Encrypt — config HTTP uniquement"
   fi
-
   run_sudo mkdir -p /etc/nginx/sites-available /etc/nginx/sites-enabled
   run_sudo cp "$tmp" "$DEST"
   run_sudo ln -sf "$DEST" "$ENABLED"
   rm -f "$tmp"
-  echo "Config installée : $DEST"
-}
-
-body_has_new_version() {
-  echo "$1" | grep -q "07 58 42 95 10"
-}
-
-body_has_old_version() {
-  echo "$1" | grep -q "07 61 91 62 22"
-}
-
-curl_check() {
-  local _label="$1"
-  shift
-  local _raw _code _body
-  _raw="$(curl -sL --max-time 20 -w $'\n__HTTP_CODE__:%{http_code}' "$@" 2>/dev/null || true)"
-  _code="$(echo "$_raw" | sed -n 's/^__HTTP_CODE__://p' | tail -1)"
-  _body="$(echo "$_raw" | sed '/^__HTTP_CODE__:/d')"
-  echo "  $_label → HTTP ${_code:-?}, ${#_body} octets"
-  if body_has_new_version "$_body"; then
-    echo "  $_label → NOUVELLE version"
-    return 0
-  fi
-  if body_has_old_version "$_body"; then
-    echo "  $_label → ANCIENNE version"
-  fi
-  return 1
-}
-
-verify_nginx_serves_new_version() {
-  local _attempt
-  for _attempt in 1 2 3 4 5; do
-    sleep 2
-    echo "=== Vérification nginx (tentative $_attempt) ==="
-
-    curl_check "direct :${QADUS_PORT}" "http://127.0.0.1:${QADUS_PORT}/" && return 0
-    curl_check "direct :${QADUS_PORT} + Host" -H "Host: www.qadus.fr" "http://127.0.0.1:${QADUS_PORT}/" && return 0
-    curl_check "nginx HTTP" -H "Host: www.qadus.fr" "http://127.0.0.1/" && return 0
-    curl_check "nginx HTTPS (SNI)" --resolve "www.qadus.fr:443:127.0.0.1" "https://www.qadus.fr/" && return 0
-  done
-  return 1
-}
-
-print_active_nginx_config() {
-  echo "=== Config nginx active (qadus) ==="
-  run_sudo nginx -T 2>/dev/null | grep -E 'server_name|proxy_pass|upstream|127\.0\.0\.1:300|# configuration file' | grep -i -B1 -A2 qadus || \
-  run_sudo nginx -T 2>/dev/null | grep -E 'server_name|proxy_pass|127\.0\.0\.1:300' | head -60 || true
+  echo "Config Debian installée : $DEST"
 }
 
 get_nginx_master_pid() {
   local _pid _f
-  _pid="$(run_sudo pgrep -f 'nginx: master process' 2>/dev/null | head -1 || true)"
+  _pid="$(run_sudo pgrep -f "$NGINX_MASTER_PATTERN" 2>/dev/null | head -1 || true)"
   if [ -n "$_pid" ]; then
     echo "$_pid"
     return 0
   fi
-  for _f in /run/nginx.pid /var/run/nginx.pid; do
+  for _f in /run/nginx.pid /var/run/nginx.pid /www/server/nginx/logs/nginx.pid; do
     if run_sudo test -s "$_f" 2>/dev/null; then
       _pid="$(run_sudo awk 'NF{print $1; exit}' "$_f" 2>/dev/null || true)"
       if [ -n "$_pid" ] && run_sudo kill -0 "$_pid" 2>/dev/null; then
@@ -202,72 +164,80 @@ get_nginx_master_pid() {
   return 1
 }
 
-ports_web_in_use() {
-  run_sudo ss -tln 2>/dev/null | grep -qE ':80 |:443 '
-}
-
-reload_or_restart_nginx() {
-  echo "=== Test nginx -t ==="
-  if ! run_sudo nginx -t 2>&1; then
-    echo "::error::nginx -t a échoué après mise à jour Qadus"
-    return 1
+reload_nginx() {
+  echo "=== Test ${NGINX_BIN} -t ==="
+  if [ -n "$NGINX_CONF" ]; then
+    run_sudo "$NGINX_BIN" -t -c "$NGINX_CONF" 2>&1
+  else
+    run_sudo "$NGINX_BIN" -t 2>&1
   fi
 
-  echo "=== Rechargement nginx ==="
   local _master=""
   if _master="$(get_nginx_master_pid)"; then
-    echo "nginx master PID ${_master} — signal HUP (reload config)"
-    if run_sudo kill -HUP "$_master" 2>&1; then
-      echo "$_master" | run_sudo tee /run/nginx.pid >/dev/null 2>&1 || true
-      sleep 1
-      echo "=== nginx rechargé (kill -HUP ${_master}) ==="
-      return 0
-    fi
-    echo "kill -HUP a échoué sur PID ${_master}"
-  fi
-
-  if ports_web_in_use; then
-    echo "::error::ports 80/443 occupés mais master nginx introuvable (pid file vide/corrompu ?)"
-    run_sudo ss -tlnp 2>/dev/null | grep -E ':80|:443' || true
-    run_sudo ps aux 2>/dev/null | grep '[n]ginx' || true
-    return 1
-  fi
-
-  echo "nginx inactif — démarrage via systemctl"
-  run_sudo systemctl enable nginx 2>/dev/null || true
-  if run_sudo systemctl start nginx 2>&1; then
-    echo "=== nginx démarré (systemctl start) ==="
+    echo "Reload nginx master PID ${_master} (kill -HUP)"
+    run_sudo kill -HUP "$_master"
+    sleep 1
+    echo "=== nginx rechargé ==="
     return 0
   fi
 
-  echo "::error::nginx start a échoué"
-  run_sudo systemctl status nginx --no-pager 2>&1 || true
-  run_sudo journalctl -u nginx.service -n 20 --no-pager 2>&1 || true
+  echo "::error::master nginx introuvable pour ${NGINX_MODE}"
+  run_sudo ps aux 2>/dev/null | grep '[n]ginx' || true
   return 1
 }
 
-if ! command -v nginx >/dev/null 2>&1; then
-  echo "nginx absent — rien à configurer"
-  exit 0
-fi
+body_has_new_version() { echo "$1" | grep -q "07 58 42 95 10"; }
+
+curl_check() {
+  local _label="$1"; shift
+  local _raw _code _body
+  _raw="$(curl -sL --max-time 20 -w $'\n__HTTP_CODE__:%{http_code}' "$@" 2>/dev/null || true)"
+  _code="$(echo "$_raw" | sed -n 's/^__HTTP_CODE__://p' | tail -1)"
+  _body="$(echo "$_raw" | sed '/^__HTTP_CODE__:/d')"
+  echo "  $_label → HTTP ${_code:-?}, ${#_body} octets"
+  body_has_new_version "$_body" && echo "  $_label → NOUVELLE version" && return 0
+  echo "$_body" | grep -q "07 61 91 62 22" && echo "  $_label → ANCIENNE version"
+  return 1
+}
+
+verify_public_proxy() {
+  local _attempt
+  for _attempt in 1 2 3 4 5; do
+    sleep 2
+    echo "=== Vérification (tentative $_attempt) ==="
+    curl_check "direct :${QADUS_PORT}" "http://127.0.0.1:${QADUS_PORT}/" && return 0
+    curl_check "nginx HTTP" -H "Host: www.qadus.fr" "http://127.0.0.1/" && return 0
+    curl_check "nginx HTTPS" --resolve "www.qadus.fr:443:127.0.0.1" "https://www.qadus.fr/" && return 0
+  done
+  return 1
+}
+
+print_active_config() {
+  echo "=== Config active qadus ==="
+  if [ "$NGINX_MODE" = "aapanel" ]; then
+    run_sudo grep -RInE 'server_name|proxy_pass|127\.0\.0\.1:300' \
+      /www/server/panel/vhost/nginx /www/server/nginx/conf 2>/dev/null \
+      | grep -i qadus | head -40 || true
+  else
+    run_sudo nginx -T 2>/dev/null | grep -E 'server_name|proxy_pass|127\.0\.0\.1:300' | grep -i qadus | head -40 || true
+  fi
+}
+
+detect_nginx_env || exit 0
 
 echo "=== Configuration nginx Qadus → ${PROXY_TARGET} ==="
 
-cleanup_sites_enabled_junk
-disable_foreign_qadus_configs
-write_site_config
-
-if ! reload_or_restart_nginx; then
-  exit 1
+if [ "$NGINX_MODE" = "aapanel" ]; then
+  patch_aapanel_qadus_vhosts
+else
+  write_debian_site_config
 fi
 
-print_active_nginx_config
+reload_nginx
+print_active_config
 
-if ! verify_nginx_serves_new_version; then
+if ! verify_public_proxy; then
   echo "::error::nginx ne sert pas la nouvelle version via le proxy"
-  echo "Diagnostics :"
-  run_sudo grep -RInE 'server_name|proxy_pass|upstream|127\.0\.0\.1:300|qadus' /etc/nginx/ 2>/dev/null | head -100 || true
-  ss -tlnp 2>/dev/null | grep -E ':300[0-9]' || true
   exit 1
 fi
 
