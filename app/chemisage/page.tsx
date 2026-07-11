@@ -110,6 +110,8 @@ export default function ChemisagePage() {
       title="Chemisage de Canalisations"
       subtitle="Technique CIPP — Réhabilitation sans démolition en Île-de-France"
       description="Qadus réhabilite vos canalisations dégradées par chemisage sans tranchée. Technique CIPP (Cured In Place Pipe). Particuliers, syndics, collectivités. Île-de-France."
+      heroImage="https://images.unsplash.com/photo-1504307651254-35680f356dfd?w=1400&q=80&auto=format&fit=crop"
+      heroImageAlt="Réhabilitation canalisation chemisage sans tranchée"
       benefits={benefits}
       steps={steps}
       faqs={faqs}

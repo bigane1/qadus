@@ -110,6 +110,8 @@ export default function CuragePage() {
       title="Curage & Hydrocurage de Canalisations"
       subtitle="Nettoyage haute pression réseaux EU, EP, collecteurs — Île-de-France"
       description="Qadus réalise le curage et l'hydrocurage de tous types de canalisations en Île-de-France. Camion hydrocureur aspirateur, intervention préventive et curative. Particuliers, syndics, industries."
+      heroImage="https://images.unsplash.com/photo-1590496793929-36417d3117de?w=1400&q=80&auto=format&fit=crop"
+      heroImageAlt="Camion hydrocureur curage canalisation haute pression"
       benefits={benefits}
       steps={steps}
       faqs={faqs}

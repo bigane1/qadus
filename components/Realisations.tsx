@@ -6,6 +6,8 @@ const realisations = [
     resultat: "Réseau totalement dégagé en 45 min",
     icon: "🚽",
     color: "blue",
+    image: "https://images.unsplash.com/photo-1607472586893-edb57bdc0e39?w=600&q=75&auto=format&fit=crop",
+    imageAlt: "Technicien débouchage WC professionnel",
   },
   {
     type: "Inspection caméra",
@@ -14,6 +16,8 @@ const realisations = [
     resultat: "Racines localisées à 18 m — curage effectué",
     icon: "📷",
     color: "purple",
+    image: "https://images.unsplash.com/photo-1581094794329-c8112a89af12?w=600&q=75&auto=format&fit=crop",
+    imageAlt: "Inspection caméra canalisation endoscopique",
   },
   {
     type: "Chemisage sans tranchée",
@@ -22,6 +26,8 @@ const realisations = [
     resultat: "Économie de 60% vs remplacement classique",
     icon: "🧱",
     color: "orange",
+    image: "https://images.unsplash.com/photo-1504307651254-35680f356dfd?w=600&q=75&auto=format&fit=crop",
+    imageAlt: "Travaux réhabilitation canalisation chantier",
   },
   {
     type: "Curage hydrocurage",
@@ -30,6 +36,8 @@ const realisations = [
     resultat: "Réseau nettoyé — contrat d'entretien annuel signé",
     icon: "🔩",
     color: "green",
+    image: "https://images.unsplash.com/photo-1590496793929-36417d3117de?w=600&q=75&auto=format&fit=crop",
+    imageAlt: "Camion hydrocureur curage canalisation",
   },
   {
     type: "Assainissement",
@@ -38,6 +46,8 @@ const realisations = [
     resultat: "Mise en conformité validée par la SPANC",
     icon: "♻️",
     color: "teal",
+    image: "https://images.unsplash.com/photo-1558618666-fcd25c85cd64?w=600&q=75&auto=format&fit=crop",
+    imageAlt: "Installation assainissement réseau eaux usées",
   },
   {
     type: "Poste de relevage",
@@ -46,6 +56,8 @@ const realisations = [
     resultat: "Remis en service en 2h, zéro interruption d'activité",
     icon: "⚙️",
     color: "red",
+    image: "https://images.unsplash.com/photo-1621905251918-48416bd8575a?w=600&q=75&auto=format&fit=crop",
+    imageAlt: "Technicien réparation pompe poste relevage",
   },
 ];
 
@@ -81,23 +93,26 @@ export default function Realisations() {
               key={r.type + r.lieu}
               className="bg-white border border-slate-200 rounded-2xl overflow-hidden hover:border-blue-200 hover:shadow-xl hover:-translate-y-1 transition-all"
             >
-              {/* Header carte */}
-              <div className={`px-6 py-4 flex items-center gap-3 border-b ${colorMap[r.color]}`}>
-                <span className="text-3xl">{r.icon}</span>
-                <div>
-                  <div className="font-bold text-sm">{r.type}</div>
-                  <div className="text-xs opacity-70 flex items-center gap-1">
-                    📍 {r.lieu}
-                  </div>
+              {/* Photo */}
+              <div className="relative h-44 overflow-hidden">
+                <img
+                  src={r.image}
+                  alt={r.imageAlt}
+                  className="w-full h-full object-cover"
+                  loading="lazy"
+                />
+                <div className={`absolute top-3 left-3 flex items-center gap-2 px-3 py-1.5 rounded-full text-xs font-bold border ${colorMap[r.color]}`}>
+                  <span>{r.icon}</span> {r.type}
                 </div>
               </div>
 
               {/* Corps */}
-              <div className="px-6 py-5">
-                <p className="text-sm text-slate-600 leading-relaxed mb-4">
+              <div className="px-5 py-4">
+                <div className="text-xs text-slate-400 mb-2 flex items-center gap-1">📍 {r.lieu}</div>
+                <p className="text-sm text-slate-600 leading-relaxed mb-3">
                   {r.description}
                 </p>
-                <div className="flex items-start gap-2 bg-green-50 border border-green-200 rounded-xl px-4 py-3">
+                <div className="flex items-start gap-2 bg-green-50 border border-green-200 rounded-xl px-3 py-2.5">
                   <span className="text-green-600 font-bold text-base mt-0.5">✓</span>
                   <p className="text-sm text-green-800 font-semibold">{r.resultat}</p>
                 </div>

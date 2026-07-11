@@ -17,6 +17,8 @@ interface ServicePageLayoutProps {
   title: string;
   subtitle: string;
   description: string;
+  heroImage: string;
+  heroImageAlt: string;
   benefits: { icon: string; title: string; text: string }[];
   steps: { num: string; title: string; text: string }[];
   faqs: Faq[];
@@ -28,6 +30,8 @@ export default function ServicePageLayout({
   title,
   subtitle,
   description,
+  heroImage,
+  heroImageAlt,
   benefits,
   steps,
   faqs,
@@ -75,6 +79,22 @@ export default function ServicePageLayout({
               <span>✅ Intervention 24h/24 — 7j/7</span>
               <span>✅ Île-de-France</span>
               <span>✅ Techniciens certifiés</span>
+            </div>
+          </div>
+        </section>
+
+        {/* Photo hero service */}
+        <section className="relative h-72 sm:h-96 overflow-hidden">
+          <img
+            src={heroImage}
+            alt={heroImageAlt}
+            className="w-full h-full object-cover"
+            loading="eager"
+          />
+          <div className="absolute inset-0 bg-gradient-to-r from-blue-900/70 to-transparent flex items-center px-8">
+            <div className="max-w-md text-white">
+              <p className="text-2xl font-black mb-2">{subtitle}</p>
+              <p className="text-blue-200 text-sm">{description}</p>
             </div>
           </div>
         </section>

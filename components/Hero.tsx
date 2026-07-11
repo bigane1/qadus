@@ -82,30 +82,44 @@ export default function Hero() {
           </div>
         </div>
 
-        {/* Right — stat cards */}
-        <div className="grid grid-cols-2 gap-4">
-          {stats.map((s) => (
-            <div
-              key={s.label}
-              className="bg-white/10 backdrop-blur-sm border border-white/15 rounded-2xl p-6 text-center hover:bg-white/15 transition-all hover:-translate-y-1"
-            >
-              <div className="text-4xl font-black text-white mb-1">{s.value}</div>
-              <div className="text-sm text-slate-300 font-medium">{s.label}</div>
+        {/* Right — photo + stats */}
+        <div className="relative">
+          {/* Photo principale */}
+          <div className="relative rounded-3xl overflow-hidden shadow-2xl shadow-blue-900/50">
+            <img
+              src="https://images.unsplash.com/photo-1607472586893-edb57bdc0e39?w=800&q=80&auto=format&fit=crop"
+              alt="Technicien Qadus en intervention débouchage canalisation"
+              className="w-full h-[420px] object-cover"
+              loading="eager"
+            />
+            {/* Badge urgence flottant */}
+            <div className="absolute top-4 left-4 bg-green-500 text-white text-xs font-bold px-3 py-1.5 rounded-full flex items-center gap-1.5">
+              <span className="w-2 h-2 rounded-full bg-white animate-pulse" />
+              Technicien disponible maintenant
             </div>
-          ))}
+            {/* Overlay bas */}
+            <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-slate-900/90 to-transparent p-5">
+              <div className="flex items-center gap-3">
+                <div className="w-10 h-10 rounded-full bg-orange-500 flex items-center justify-center text-white font-black">Q</div>
+                <div>
+                  <div className="text-white font-bold text-sm">Qadus — Île-de-France</div>
+                  <div className="text-slate-300 text-xs">Intervention en moins de 2h</div>
+                </div>
+              </div>
+            </div>
+          </div>
 
-          {/* Extra card — Urgence */}
-          <div className="col-span-2 bg-gradient-to-r from-orange-500 to-orange-600 rounded-2xl p-5 flex items-center gap-4">
-            <span className="text-4xl">🚨</span>
-            <div>
-              <div className="text-white font-bold text-lg">Urgence ? Appelez maintenant</div>
-              <a
-                href={`tel:+33${TEL.substring(1)}`}
-                className="text-orange-100 font-semibold hover:text-white transition-colors text-lg underline underline-offset-2"
+          {/* Stats en dessous */}
+          <div className="grid grid-cols-2 gap-3 mt-3">
+            {stats.map((s) => (
+              <div
+                key={s.label}
+                className="bg-white/10 backdrop-blur-sm border border-white/15 rounded-2xl p-4 text-center"
               >
-                {TEL_DISPLAY}
-              </a>
-            </div>
+                <div className="text-3xl font-black text-white mb-0.5">{s.value}</div>
+                <div className="text-xs text-slate-300 font-medium">{s.label}</div>
+              </div>
+            ))}
           </div>
         </div>
       </div>

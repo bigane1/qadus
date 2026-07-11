@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from "react";
 import Link from "next/link";
+import Image from "next/image";
 
 const TEL = "0761916222";
 const TEL_DISPLAY = "07 61 91 62 22";
@@ -39,15 +40,7 @@ export default function Header() {
         <div className="flex items-center justify-between h-16 lg:h-18">
           {/* Logo */}
           <Link href="/" className="flex items-center gap-2 flex-shrink-0">
-            <span className="text-2xl">🔧</span>
-            <div className="leading-tight">
-              <span className="text-xl font-black text-slate-900 tracking-tight">
-                Qadus
-              </span>
-              <span className="hidden sm:block text-[10px] text-slate-500 font-medium -mt-1">
-                Plomberie · Débouchage · Assainissement
-              </span>
-            </div>
+            <Image src="/logo.png" alt="Qadus" width={120} height={40} className="h-10 w-auto" priority />
           </Link>
 
           {/* Nav desktop */}

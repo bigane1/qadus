@@ -110,6 +110,8 @@ export default function InspectionCameraPage() {
       title="Inspection Caméra Canalisation"
       subtitle="Diagnostic vidéo HD & robot d'inspection — Île-de-France"
       description="Qadus réalise l'inspection caméra de vos canalisations en Île-de-France. Caméra endoscopique HD, robot télécommandé, rapport normalisé. Particuliers, syndics, collectivités."
+      heroImage="https://images.unsplash.com/photo-1581094794329-c8112a89af12?w=1400&q=80&auto=format&fit=crop"
+      heroImageAlt="Inspection caméra endoscopique canalisation professionnelle"
       benefits={benefits}
       steps={steps}
       faqs={faqs}

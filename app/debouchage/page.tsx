@@ -110,6 +110,8 @@ export default function DebouchagePage() {
       title="Débouchage Canalisation Île-de-France"
       subtitle="Évier, WC, douche, réseau — Intervention en moins de 2h"
       description="Qadus intervient sur tous types de canalisations bouchées en Île-de-France. Particuliers et professionnels. Hydrocurage haute pression, inspection caméra, garantie résultat."
+      heroImage="https://images.unsplash.com/photo-1558618666-fcd25c85cd64?w=1400&q=80&auto=format&fit=crop"
+      heroImageAlt="Technicien débouchage canalisation professionnel"
       benefits={benefits}
       steps={steps}
       faqs={faqs}
