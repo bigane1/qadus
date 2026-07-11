@@ -36,10 +36,10 @@ patch_qadus_nginx_files() {
   for _f in "${_files[@]}"; do
     echo "→ $_f"
     run_sudo sed -i -E \
-      "s|proxy_pass[[:space:]]+https?://(127\\.0\\.0\\.1|localhost):[0-9]+/?|proxy_pass http://127.0.0.1:${QADUS_PORT}|g" \
+      "s#proxy_pass[[:space:]]+https?://(127\\.0\\.0\\.1|localhost):[0-9]+/?#proxy_pass http://127.0.0.1:${QADUS_PORT}#g" \
       "$_f"
     run_sudo sed -i -E \
-      "s|server[[:space:]]+(127\\.0\\.0\\.1|localhost):[0-9]+;|server 127.0.0.1:${QADUS_PORT};|g" \
+      "s#server[[:space:]]+(127\\.0\\.0\\.1|localhost):[0-9]+;#server 127.0.0.1:${QADUS_PORT};#g" \
       "$_f"
   done
 }
