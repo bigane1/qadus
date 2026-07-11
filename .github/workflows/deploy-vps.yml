@@ -91,7 +91,16 @@ jobs:
             if [ ! -d "$APP_DIR/.git" ]; then
               sudo mkdir -p "$APP_DIR"
               sudo chown "$(whoami):$(whoami)" "$APP_DIR"
-              git clone https://github.com/${{ github.repository }}.git "$APP_DIR"
+              # Si le dossier existe mais n'est pas un repo git, on l'initialise
+              if [ -d "$APP_DIR" ] && [ "$(ls -A $APP_DIR)" ]; then
+                cd "$APP_DIR"
+                git init
+                git remote add origin https://github.com/${{ github.repository }}.git
+                git fetch origin main
+                git checkout -f main
+              else
+                git clone https://github.com/${{ github.repository }}.git "$APP_DIR"
+              fi
             fi
             cd "$APP_DIR"
             git fetch origin main
