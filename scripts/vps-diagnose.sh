@@ -34,17 +34,24 @@ _b="$(curl -sf --max-time 10 http://127.0.0.1:3002/ 2>/dev/null || true)"
 if echo "$_b" | grep -q "07 58 42 95 10"; then echo "3002 → NOUVELLE version"; elif echo "$_b" | grep -q "07 61 91 62 22"; then echo "3002 → ANCIENNE version"; elif [ -n "$_b" ]; then echo "3002 → répond (numéro inconnu)"; else echo "3002 → pas de réponse"; fi
 
 echo
-echo "--- curl via nginx (Host: www.qadus.fr) ---"
-for url in "http://127.0.0.1/" "https://127.0.0.1/"; do
-  _n="$(curl -sfk --max-time 10 -H "Host: www.qadus.fr" "$url" 2>/dev/null || true)"
-  if echo "$_n" | grep -q "07 58 42 95 10"; then echo "$url → NOUVELLE version"; elif echo "$_n" | grep -q "07 61 91 62 22"; then echo "$url → ANCIENNE version"; elif [ -n "$_n" ]; then echo "$url → répond (numéro inconnu)"; else echo "$url → pas de réponse"; fi
+echo "--- curl direct :3002 + Host ---"
+_b="$(curl -sf --max-time 10 -H "Host: www.qadus.fr" http://127.0.0.1:3002/ 2>/dev/null || true)"
+if echo "$_b" | grep -q "07 58 42 95 10"; then echo "3002+Host → NOUVELLE"; elif echo "$_b" | grep -q "07 61 91 62 22"; then echo "3002+Host → ANCIENNE"; elif [ -n "$_b" ]; then echo "3002+Host → répond"; else echo "3002+Host → pas de réponse"; fi
+
+echo
+echo "--- curl via nginx ---"
+for args in \
+  '-H "Host: www.qadus.fr" http://127.0.0.1/' \
+  '--resolve "www.qadus.fr:443:127.0.0.1" https://www.qadus.fr/'; do
+  _n="$(eval curl -sL --max-time 10 $args 2>/dev/null || true)"
+  if echo "$_n" | grep -q "07 58 42 95 10"; then echo "$args → NOUVELLE version"; elif echo "$_n" | grep -q "07 61 91 62 22"; then echo "$args → ANCIENNE version"; elif [ -n "$_n" ]; then echo "$args → répond (numéro inconnu)"; else echo "$args → pas de réponse"; fi
 done
 
 echo
-echo "--- nginx configs qadus ---"
+echo "--- nginx -T (qadus) ---"
 if command -v sudo >/dev/null 2>&1; then
-  sudo grep -RInE 'server_name|proxy_pass|upstream|127\.0\.0\.1:300' /etc/nginx/ 2>/dev/null | grep -i qadus || \
-  sudo grep -RInE 'qadus\.fr|www\.qadus\.fr|127\.0\.0\.1:300' /etc/nginx/sites-enabled/ 2>/dev/null || true
+  sudo nginx -T 2>/dev/null | grep -E 'server_name|proxy_pass|127\.0\.0\.1:300|# configuration file' | grep -i -B1 -A2 qadus || \
+  sudo grep -RInE 'qadus\.fr|proxy_pass|127\.0\.0\.1:300' /etc/nginx/ 2>/dev/null | head -40 || true
 fi
 
 echo "=========================================="
