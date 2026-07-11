@@ -183,15 +183,27 @@ print_active_nginx_config() {
   run_sudo nginx -T 2>/dev/null | grep -E 'server_name|proxy_pass|127\.0\.0\.1:300' | head -60 || true
 }
 
-nginx_is_running() {
-  if run_sudo test -s /run/nginx.pid 2>/dev/null || run_sudo test -s /var/run/nginx.pid 2>/dev/null; then
+get_nginx_master_pid() {
+  local _pid _f
+  _pid="$(run_sudo pgrep -f 'nginx: master process' 2>/dev/null | head -1 || true)"
+  if [ -n "$_pid" ]; then
+    echo "$_pid"
     return 0
   fi
-  if pgrep -x nginx >/dev/null 2>&1; then
-    return 0
-  fi
-  ss -tlnp 2>/dev/null | grep -qE ':80 .*nginx|:443 .*nginx' && return 0
+  for _f in /run/nginx.pid /var/run/nginx.pid; do
+    if run_sudo test -s "$_f" 2>/dev/null; then
+      _pid="$(run_sudo awk 'NF{print $1; exit}' "$_f" 2>/dev/null || true)"
+      if [ -n "$_pid" ] && run_sudo kill -0 "$_pid" 2>/dev/null; then
+        echo "$_pid"
+        return 0
+      fi
+    fi
+  done
   return 1
+}
+
+ports_web_in_use() {
+  run_sudo ss -tln 2>/dev/null | grep -qE ':80 |:443 '
 }
 
 reload_or_restart_nginx() {
@@ -202,19 +214,23 @@ reload_or_restart_nginx() {
   fi
 
   echo "=== Rechargement nginx ==="
-  # Sur ce VPS, nginx tourne souvent hors systemd (service disabled) :
-  # ne jamais systemctl restart si un master nginx occupe déjà :80/:443.
-  if nginx_is_running; then
-    echo "nginx déjà actif — reload direct (nginx -s reload)"
-    if run_sudo nginx -s reload 2>&1; then
-      echo "=== nginx rechargé (nginx -s reload) ==="
+  local _master=""
+  if _master="$(get_nginx_master_pid)"; then
+    echo "nginx master PID ${_master} — signal HUP (reload config)"
+    if run_sudo kill -HUP "$_master" 2>&1; then
+      echo "$_master" | run_sudo tee /run/nginx.pid >/dev/null 2>&1 || true
+      sleep 1
+      echo "=== nginx rechargé (kill -HUP ${_master}) ==="
       return 0
     fi
-    echo "nginx -s reload a échoué, tentative systemctl reload..."
-    if run_sudo systemctl reload nginx 2>&1; then
-      echo "=== nginx rechargé (systemctl reload) ==="
-      return 0
-    fi
+    echo "kill -HUP a échoué sur PID ${_master}"
+  fi
+
+  if ports_web_in_use; then
+    echo "::error::ports 80/443 occupés mais master nginx introuvable (pid file vide/corrompu ?)"
+    run_sudo ss -tlnp 2>/dev/null | grep -E ':80|:443' || true
+    run_sudo ps aux 2>/dev/null | grep '[n]ginx' || true
+    return 1
   fi
 
   echo "nginx inactif — démarrage via systemctl"
@@ -224,9 +240,7 @@ reload_or_restart_nginx() {
     return 0
   fi
 
-  echo "::error::nginx reload/start a échoué"
-  echo "Ports 80/443 :"
-  ss -tlnp 2>/dev/null | grep -E ':80|:443' || true
+  echo "::error::nginx start a échoué"
   run_sudo systemctl status nginx --no-pager 2>&1 || true
   run_sudo journalctl -u nginx.service -n 20 --no-pager 2>&1 || true
   return 1
