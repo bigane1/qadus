@@ -47,9 +47,12 @@ detect_nginx_env() {
 patch_proxy_in_file() {
   local _f="$1"
   [ -n "$_f" ] || return 0
-  run_sudo grep -qE 'qadus\.fr|www\.qadus\.fr|proxy_pass' "$_f" 2>/dev/null || return 0
+  run_sudo grep -qE 'qadus\.fr|www\.qadus\.fr|proxy_pass|qadus_next' "$_f" 2>/dev/null || return 0
   run_sudo sed -i -E \
     "s#proxy_pass[[:space:]]+https?://(127\\.0\\.0\\.1|localhost):[0-9]+/?#proxy_pass ${PROXY_TARGET}#g" \
+    "$_f"
+  run_sudo sed -i -E \
+    "s#proxy_pass[[:space:]]+https?://qadus_next/?#proxy_pass ${PROXY_TARGET}#g" \
     "$_f"
   run_sudo sed -i -E \
     "s#proxy_pass[[:space:]]+https?://[^;]+:([0-9]+)/?#proxy_pass ${PROXY_TARGET}#g" \
@@ -65,8 +68,8 @@ patch_aapanel_qadus_vhosts() {
   echo "=== Patch vhosts aaPanel (qadus.fr → ${QADUS_PORT}) ==="
   for _dir in \
     /www/server/panel/vhost/nginx \
-    /www/server/nginx/conf/vhost \
-    /www/server/panel/vhost/nginx/extension; do
+    /www/server/panel/vhost/nginx/extension/qadus.fr \
+    /www/server/nginx/conf/vhost; do
     [ -d "$_dir" ] || continue
     while IFS= read -r _f; do
       [ -n "$_f" ] || continue
