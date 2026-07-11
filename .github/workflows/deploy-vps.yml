@@ -126,6 +126,7 @@ jobs:
             sleep 15
           done
           echo "::error::Le site public ne sert pas encore la nouvelle version. Vérifiez PM2 (port 3002) et nginx sur le VPS."
+          echo "Sur le VPS : bash scripts/vps-diagnose.sh"
           exit 1
 
       - name: Vérifier qadus.fr accessible
