@@ -75,6 +75,13 @@ export const metadata: Metadata = {
   alternates: {
     canonical: SITE_URL,
   },
+  icons: {
+    icon: [
+      { url: "/favicon.png", sizes: "32x32", type: "image/png" },
+      { url: "/icon-192.png", sizes: "192x192", type: "image/png" },
+    ],
+    apple: [{ url: "/apple-icon.png", sizes: "180x180", type: "image/png" }],
+  },
 };
 
 export default function RootLayout({
@@ -91,8 +98,7 @@ export default function RootLayout({
             __html: JSON.stringify(localBusinessSchema),
           }}
         />
-        <link rel="icon" href="/favicon.ico" sizes="any" />
-        <meta name="theme-color" content="#0052CC" />
+        <meta name="theme-color" content="#0D1B2A" />
       </head>
       <body className="bg-white text-slate-700 overflow-x-hidden">
         {children}

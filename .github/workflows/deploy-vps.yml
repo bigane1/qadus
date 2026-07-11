@@ -88,10 +88,10 @@ jobs:
               APP_DIR="${APP_DIR:-/var/www/qadus}"
             fi
             echo "=== Dossier app : $APP_DIR ==="
+            echo "=== Commit GitHub : ${{ github.sha }} ==="
             if [ ! -d "$APP_DIR/.git" ]; then
               sudo mkdir -p "$APP_DIR"
               sudo chown "$(whoami):$(whoami)" "$APP_DIR"
-              # Si le dossier existe mais n'est pas un repo git, on l'initialise
               if [ -d "$APP_DIR" ] && [ "$(ls -A $APP_DIR)" ]; then
                 cd "$APP_DIR"
                 git init
@@ -105,10 +105,30 @@ jobs:
             cd "$APP_DIR"
             git fetch origin main
             git checkout main
-            git reset --hard origin/main
+            git reset --hard "${{ github.sha }}"
+            echo "=== Commit VPS après reset : $(git rev-parse HEAD) ==="
             bash scripts/vps-deploy.sh
 
-      - name: Vérifier qadus.fr en production
+      - name: Vérifier le contenu en production
+        run: |
+          echo "=== Vérification du numéro 07 58 42 95 10 sur https://www.qadus.fr/ ==="
+          for attempt in 1 2 3 4 5 6; do
+            body=$(curl -sL --max-time 20 https://www.qadus.fr/ || true)
+            if echo "$body" | grep -q "07 58 42 95 10"; then
+              echo "=== OK : nouvelle version déployée (tentative $attempt) ==="
+              exit 0
+            fi
+            if echo "$body" | grep -q "07 61 91 62 22"; then
+              echo "tentative $attempt : ancienne version encore visible..."
+            else
+              echo "tentative $attempt : réponse inattendue"
+            fi
+            sleep 15
+          done
+          echo "::error::Le site public ne sert pas encore la nouvelle version. Vérifiez PM2 (port 3002) et nginx sur le VPS."
+          exit 1
+
+      - name: Vérifier qadus.fr accessible
         run: |
           echo "=== Vérification publique https://qadus.fr/ ==="
           for attempt in 1 2 3; do

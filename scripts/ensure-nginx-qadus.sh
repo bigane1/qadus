@@ -38,11 +38,14 @@ done < <(run_sudo grep -rl "qadus\.fr" /etc/nginx/ 2>/dev/null || true)
 if ((${#_qadus_files[@]})); then
   echo "Config existante trouvée — vérification du proxy_pass..."
   for _f in "${_qadus_files[@]}"; do
-    if run_sudo grep -q "proxy_pass" "$_f"; then
+    if run_sudo grep -qE "proxy_pass|upstream" "$_f"; then
       run_sudo sed -i -E \
         's/proxy_pass[[:space:]]+http:\/\/(127\.0\.0\.1|localhost):[0-9]+[[:space:]]*;/proxy_pass http:\/\/127.0.0.1:3002;/g' \
         "$_f"
-      echo "→ proxy_pass mis à jour dans $_f"
+      run_sudo sed -i -E \
+        's/server[[:space:]]+127\.0\.0\.1:[0-9]+;/server 127.0.0.1:3002;/g' \
+        "$_f"
+      echo "→ proxy upstream mis à jour dans $_f"
     fi
   done
 else
