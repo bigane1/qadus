@@ -183,6 +183,17 @@ print_active_nginx_config() {
   run_sudo nginx -T 2>/dev/null | grep -E 'server_name|proxy_pass|127\.0\.0\.1:300' | head -60 || true
 }
 
+nginx_is_running() {
+  if run_sudo test -s /run/nginx.pid 2>/dev/null || run_sudo test -s /var/run/nginx.pid 2>/dev/null; then
+    return 0
+  fi
+  if pgrep -x nginx >/dev/null 2>&1; then
+    return 0
+  fi
+  ss -tlnp 2>/dev/null | grep -qE ':80 .*nginx|:443 .*nginx' && return 0
+  return 1
+}
+
 reload_or_restart_nginx() {
   echo "=== Test nginx -t ==="
   if ! run_sudo nginx -t 2>&1; then
@@ -191,23 +202,33 @@ reload_or_restart_nginx() {
   fi
 
   echo "=== Rechargement nginx ==="
-  if run_sudo systemctl is-active nginx >/dev/null 2>&1; then
-    if run_sudo systemctl reload nginx 2>&1; then
-      echo "=== nginx rechargé (reload) ==="
+  # Sur ce VPS, nginx tourne souvent hors systemd (service disabled) :
+  # ne jamais systemctl restart si un master nginx occupe déjà :80/:443.
+  if nginx_is_running; then
+    echo "nginx déjà actif — reload direct (nginx -s reload)"
+    if run_sudo nginx -s reload 2>&1; then
+      echo "=== nginx rechargé (nginx -s reload) ==="
       return 0
     fi
-    echo "reload échoué, tentative restart..."
+    echo "nginx -s reload a échoué, tentative systemctl reload..."
+    if run_sudo systemctl reload nginx 2>&1; then
+      echo "=== nginx rechargé (systemctl reload) ==="
+      return 0
+    fi
   fi
 
-  if run_sudo systemctl restart nginx 2>&1; then
-    echo "=== nginx redémarré (restart) ==="
+  echo "nginx inactif — démarrage via systemctl"
+  run_sudo systemctl enable nginx 2>/dev/null || true
+  if run_sudo systemctl start nginx 2>&1; then
+    echo "=== nginx démarré (systemctl start) ==="
     return 0
   fi
 
-  echo "::error::nginx reload/restart a échoué"
+  echo "::error::nginx reload/start a échoué"
+  echo "Ports 80/443 :"
+  ss -tlnp 2>/dev/null | grep -E ':80|:443' || true
   run_sudo systemctl status nginx --no-pager 2>&1 || true
-  run_sudo journalctl -u nginx.service -n 30 --no-pager 2>&1 || true
-  run_sudo nginx -t 2>&1 || true
+  run_sudo journalctl -u nginx.service -n 20 --no-pager 2>&1 || true
   return 1
 }
 
