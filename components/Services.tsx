@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { serviceImages } from "@/lib/images";
+import ChemisageBeforeAfter from "@/components/ChemisageBeforeAfter";
 
 const services = [
   {
@@ -43,8 +44,9 @@ const services = [
     href: "/chemisage",
     accent: "bg-orange-100 text-orange-700 border-orange-200",
     iconBg: "bg-orange-50",
-    image: serviceImages.chemisage.src,
-    imageAlt: serviceImages.chemisage.alt,
+    image: serviceImages.chemisageAfter.src,
+    imageAlt: serviceImages.chemisageAfter.alt,
+    beforeAfter: true,
   },
   {
     title: "Assainissement & Réseaux",
@@ -116,13 +118,40 @@ export default function Services() {
               href={s.href}
               className="group flex flex-col bg-white rounded-2xl p-4 border border-slate-200 hover:border-blue-200 hover:shadow-lg hover:-translate-y-1 transition-all duration-200"
             >
-              {/* Photo au premier plan — pas de fond, pas d'overlay */}
-              <img
-                src={s.image}
-                alt={s.imageAlt}
-                className="w-full h-36 object-cover rounded-xl mb-4"
-                loading="lazy"
-              />
+              {/* Photo — avant/après pour le chemisage */}
+              {"beforeAfter" in s && s.beforeAfter ? (
+                <div className="grid grid-cols-2 gap-1 mb-4 rounded-xl overflow-hidden h-36">
+                  <div className="relative">
+                    <img
+                      src={serviceImages.chemisageBefore.src}
+                      alt={serviceImages.chemisageBefore.alt}
+                      className="w-full h-full object-cover"
+                      loading="lazy"
+                    />
+                    <span className="absolute bottom-1 left-1 bg-red-600 text-white text-[9px] font-bold px-1.5 py-0.5 rounded">
+                      Avant
+                    </span>
+                  </div>
+                  <div className="relative">
+                    <img
+                      src={serviceImages.chemisageAfter.src}
+                      alt={serviceImages.chemisageAfter.alt}
+                      className="w-full h-full object-cover"
+                      loading="lazy"
+                    />
+                    <span className="absolute bottom-1 left-1 bg-green-600 text-white text-[9px] font-bold px-1.5 py-0.5 rounded">
+                      Après
+                    </span>
+                  </div>
+                </div>
+              ) : (
+                <img
+                  src={s.image}
+                  alt={s.imageAlt}
+                  className="w-full h-36 object-cover rounded-xl mb-4"
+                  loading="lazy"
+                />
+              )}
 
               <div className="flex items-start justify-between gap-3 mb-3 px-1">
                 <div
@@ -151,7 +180,9 @@ export default function Services() {
           ))}
         </div>
 
-        <div className="mt-10 bg-gradient-to-r from-blue-900 via-blue-800 to-slate-900 rounded-3xl p-8 flex flex-col md:flex-row items-center gap-6">
+        <div className="mt-10 bg-white border border-slate-200 rounded-3xl p-6 md:p-8">
+          <ChemisageBeforeAfter compact className="mb-6" />
+          <div className="bg-gradient-to-r from-blue-900 via-blue-800 to-slate-900 rounded-2xl p-8 flex flex-col md:flex-row items-center gap-6">
           <div className="text-5xl flex-shrink-0">🔧</div>
           <div className="flex-1 text-center md:text-left">
             <div className="inline-block bg-orange-500 text-white text-xs font-bold uppercase tracking-widest px-3 py-1 rounded-full mb-2">
@@ -172,6 +203,7 @@ export default function Services() {
           >
             Découvrir le chemisage →
           </Link>
+          </div>
         </div>
       </div>
     </section>

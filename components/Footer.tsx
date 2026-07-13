@@ -1,4 +1,5 @@
 import Link from "next/link";
+import Image from "next/image";
 import { FACEBOOK_URL, TEL_DISPLAY, telHref } from "@/lib/contact";
 
 const currentYear = new Date().getFullYear();
@@ -31,10 +32,15 @@ export default function Footer() {
       <div className="max-w-7xl mx-auto px-4 py-16 grid sm:grid-cols-2 lg:grid-cols-4 gap-10">
         {/* Brand */}
         <div>
-          <div className="flex items-center gap-2 mb-4">
-            <span className="text-2xl">🔧</span>
-            <span className="text-xl font-black text-white">Qadus</span>
-          </div>
+          <Link href="/" className="inline-block mb-4">
+            <Image
+              src="/logo.png"
+              alt="Qadus"
+              width={140}
+              height={48}
+              style={{ width: "auto", height: "48px" }}
+            />
+          </Link>
           <p className="text-sm leading-relaxed mb-5">
             Plombier, spécialiste débouchage et assainissement à Poissy et dans
             les Yvelines (78). Disponible 24h/24 — 7j/7.
@@ -72,6 +78,16 @@ export default function Footer() {
             Nos services
           </h4>
           <ul className="space-y-2">
+            <li>
+              <Link href="/qui-sommes-nous" className="text-sm hover:text-white transition-colors">
+                Qui sommes-nous
+              </Link>
+            </li>
+            <li>
+              <Link href="/blog" className="text-sm hover:text-white transition-colors">
+                Blog / Actus
+              </Link>
+            </li>
             {services.map((s) => (
               <li key={s.label}>
                 <Link

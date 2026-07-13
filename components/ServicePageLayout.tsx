@@ -2,6 +2,7 @@ import Link from "next/link";
 import Header from "./Header";
 import Footer from "./Footer";
 import FloatingCTA from "./FloatingCTA";
+import ChemisageBeforeAfter from "./ChemisageBeforeAfter";
 import { TEL_DISPLAY, telHref, whatsappHref } from "@/lib/contact";
 
 interface Faq {
@@ -144,25 +145,12 @@ export default function ServicePageLayout({
         </section>
 
         {beforeAfter && (
-          <section className="py-16 px-4 bg-white">
+          <section className="py-16 px-4 bg-slate-50">
             <div className="max-w-6xl mx-auto">
-              <h2 className="text-3xl font-black text-slate-900 text-center mb-10">
-                {beforeAfter.title}
-              </h2>
-              <div className="grid md:grid-cols-2 gap-6">
-                <div className="bg-slate-50 border border-slate-200 rounded-2xl overflow-hidden">
-                  <img src={beforeAfter.before.src} alt={beforeAfter.before.alt} className="w-full h-72 object-cover" loading="lazy" />
-                  <div className="px-5 py-4">
-                    <p className="text-sm font-bold uppercase tracking-wide text-red-700">{beforeAfter.before.label}</p>
-                  </div>
-                </div>
-                <div className="bg-slate-50 border border-slate-200 rounded-2xl overflow-hidden">
-                  <img src={beforeAfter.after.src} alt={beforeAfter.after.alt} className="w-full h-72 object-cover" loading="lazy" />
-                  <div className="px-5 py-4">
-                    <p className="text-sm font-bold uppercase tracking-wide text-green-700">{beforeAfter.after.label}</p>
-                  </div>
-                </div>
-              </div>
+              <ChemisageBeforeAfter
+                title={beforeAfter.title}
+                subtitle="Comme sur nos chantiers : inspection vidéo avant travaux et contrôle final après chemisage."
+              />
             </div>
           </section>
         )}

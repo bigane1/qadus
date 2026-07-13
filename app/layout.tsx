@@ -98,7 +98,7 @@ export default function RootLayout({
             __html: JSON.stringify(localBusinessSchema),
           }}
         />
-        <meta name="theme-color" content="#0D1B2A" />
+        <meta name="theme-color" content="#123032" />
       </head>
       <body className="bg-white text-slate-700 overflow-x-hidden">
         {children}

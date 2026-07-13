@@ -35,18 +35,18 @@ export const serviceImages = {
   },
   /** Réhabilitation réseau — chemisage CIPP sans tranchée */
   chemisage: {
-    src: pex(8088496),
-    alt: "Canalisation en cours de réhabilitation sans tranchée",
+    src: pex(5691622),
+    alt: "Canalisation réhabilitée par chemisage CIPP sans tranchée",
   },
-  /** Avant intervention chemisage */
+  /** Avant chemisage — réseau dégradé (vue inspection caméra) */
   chemisageBefore: {
-    src: pex(257736),
-    alt: "Canalisation vieillissante avec depots et fissures avant chemisage",
+    src: pex(14664521),
+    alt: "Intérieur de canalisation avant chemisage — corrosion, dépôts et fissures visibles à la caméra",
   },
-  /** Après intervention chemisage */
+  /** Après chemisage — conduite restaurée (contrôle caméra final) */
   chemisageAfter: {
-    src: pex(205316),
-    alt: "Canalisation restauree apres intervention de chemisage",
+    src: pex(2219024),
+    alt: "Intérieur de canalisation après chemisage CIPP — paroi lisse et étanche",
   },
   /** Réseaux EU/EV/EP — assainissement collectif et individuel */
   assainissement: {
@@ -87,6 +87,6 @@ export const heroImage: ServiceImage = {
 
 export const heroHighlights = [
   { ...serviceImages.debouchage, label: "Débouchage" },
-  { ...serviceImages.chemisage, label: "Chemisage" },
+  { ...serviceImages.chemisageAfter, label: "Chemisage" },
   { ...serviceImages.inspectionCamera, label: "Inspection" },
 ] as const;
