@@ -4,9 +4,9 @@ set -uo pipefail
 
 check_version() {
   local _body="$1"
-  if echo "$_body" | grep -qE "06 67 25 08 85|0667250885"; then
+  if echo "$_body" | grep -qE "06 67 25 08 85|0667250885|tel:\+33667250885|\+33667250885"; then
     echo "NOUVELLE"
-  elif echo "$_body" | grep -qE "07 58 42 95 10|07 61 91 62 22"; then
+  elif echo "$_body" | grep -qE "07 58 42 95 10|07 61 91 62 22|0758429510|0761916222"; then
     echo "ANCIENNE"
   elif [ -n "$_body" ]; then
     echo "INCONNUE"
@@ -43,7 +43,7 @@ fi
 
 echo
 echo "--- curl direct :3002 ---"
-_b="$(curl -sf --max-time 10 http://127.0.0.1:3002/ 2>/dev/null || true)"
+_b="$(curl -sf --compressed --max-time 10 http://127.0.0.1:3002/ 2>/dev/null || true)"
 echo "3002 → $(check_version "$_b")"
 
 echo
@@ -51,7 +51,7 @@ echo "--- curl via nginx ---"
 for args in \
   '-H "Host: www.qadus.fr" http://127.0.0.1/' \
   '--resolve "www.qadus.fr:443:127.0.0.1" https://www.qadus.fr/'; do
-  _n="$(eval curl -sL --max-time 10 $args 2>/dev/null || true)"
+  _n="$(eval curl -sL --compressed --max-time 10 $args 2>/dev/null || true)"
   echo "$args → $(check_version "$_n")"
 done
 

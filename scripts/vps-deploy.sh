@@ -85,7 +85,7 @@ free_port() {
 }
 
 body_has_qadus_phone() {
-  echo "$1" | grep -qE "06 67 25 08 85|0667250885"
+  echo "$1" | grep -qE "06 67 25 08 85|0667250885|tel:\+33667250885|\+33667250885"
 }
 
 body_version_hint() {
@@ -125,7 +125,7 @@ _http_ok=false
 _content_ok=false
 for _attempt in 1 2 3 4 5 6 8 10; do
   sleep 5
-  _body="$(curl -sf --max-time 20 -H "Cache-Control: no-cache" "http://127.0.0.1:3002/?_deploy=$(date +%s)" 2>/dev/null || true)"
+  _body="$(curl -sf --compressed --max-time 20 -H "Cache-Control: no-cache" "http://127.0.0.1:3002/?_deploy=$(date +%s)" 2>/dev/null || true)"
   if [ -n "$_body" ]; then
     _http_ok=true
     _hint="$(body_version_hint "$_body")"

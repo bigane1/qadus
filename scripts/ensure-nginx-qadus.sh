@@ -300,7 +300,7 @@ reload_nginx() {
   return 1
 }
 
-body_has_new_version() { echo "$1" | grep -qE "06 67 25 08 85|0667250885"; }
+body_has_new_version() { echo "$1" | grep -qE "06 67 25 08 85|0667250885|tel:\+33667250885|\+33667250885"; }
 
 body_has_old_version() {
   echo "$1" | grep -qE "07 58 42 95 10|07 61 91 62 22|0758429510|0761916222"
@@ -309,7 +309,7 @@ body_has_old_version() {
 curl_check() {
   local _label="$1"; shift
   local _raw _code _body
-  _raw="$(curl -sL --max-time 20 -w $'\n__HTTP_CODE__:%{http_code}' "$@" 2>/dev/null || true)"
+  _raw="$(curl -sL --compressed --max-time 20 -w $'\n__HTTP_CODE__:%{http_code}' "$@" 2>/dev/null || true)"
   _code="$(echo "$_raw" | sed -n 's/^__HTTP_CODE__://p' | tail -1)"
   _body="$(echo "$_raw" | sed '/^__HTTP_CODE__:/d')"
   echo "  $_label → HTTP ${_code:-?}, ${#_body} octets"
