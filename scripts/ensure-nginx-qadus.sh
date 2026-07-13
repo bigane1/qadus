@@ -63,6 +63,93 @@ patch_proxy_in_file() {
   echo "→ proxy mis à jour : $_f"
 }
 
+disable_aapanel_qadus_extensions() {
+  local _ext="/www/server/panel/vhost/nginx/extension/qadus.fr"
+  if run_sudo test -d "$_ext" 2>/dev/null; then
+    run_sudo mv "$_ext" "${_ext}.disabled-by-qadus-deploy" 2>/dev/null || true
+    echo "Extensions aaPanel désactivées : $_ext"
+  fi
+}
+
+write_aapanel_qadus_config() {
+  local _dest="/www/server/panel/vhost/nginx/qadus.fr.conf"
+  local _tmp
+  _tmp="$(mktemp)"
+
+  if run_sudo test -f "$_dest" 2>/dev/null; then
+    run_sudo cp "$_dest" "${_dest}.bak.$(date +%s)"
+  fi
+
+  cat >"$_tmp" <<EOF
+# Qadus — proxy vers Next.js PM2 (port ${QADUS_PORT})
+# Réécrit par scripts/ensure-nginx-qadus.sh
+
+upstream qadus_next {
+    server 127.0.0.1:${QADUS_PORT};
+    keepalive 32;
+}
+
+server {
+    listen 80;
+    server_name qadus.fr www.qadus.fr;
+
+    location /.well-known/acme-challenge/ {
+        root /var/www/certbot;
+        try_files \$uri =404;
+    }
+
+    location / {
+        return 301 https://www.qadus.fr\$request_uri;
+    }
+}
+
+server {
+    listen 443 ssl;
+    server_name qadus.fr;
+    ssl_certificate /etc/letsencrypt/live/qadus.fr/fullchain.pem;
+    ssl_certificate_key /etc/letsencrypt/live/qadus.fr/privkey.pem;
+    return 301 https://www.qadus.fr\$request_uri;
+}
+
+server {
+    listen 443 ssl;
+    server_name www.qadus.fr;
+
+    ssl_certificate /etc/letsencrypt/live/qadus.fr/fullchain.pem;
+    ssl_certificate_key /etc/letsencrypt/live/qadus.fr/privkey.pem;
+    ssl_protocols TLSv1.2 TLSv1.3;
+    ssl_ciphers HIGH:!aNULL:!MD5;
+
+    client_max_body_size 10M;
+
+    location /_next/static/ {
+        proxy_pass ${PROXY_TARGET};
+        proxy_http_version 1.1;
+        proxy_set_header Host \$host;
+        add_header Cache-Control "public, max-age=31536000, immutable";
+    }
+
+    location / {
+        proxy_http_version 1.1;
+        proxy_set_header Host \$host;
+        proxy_set_header X-Real-IP \$remote_addr;
+        proxy_set_header X-Forwarded-For \$proxy_add_x_forwarded_for;
+        proxy_set_header X-Forwarded-Proto \$scheme;
+        proxy_set_header Connection "";
+        proxy_pass ${PROXY_TARGET};
+        proxy_read_timeout 60s;
+        proxy_connect_timeout 10s;
+        proxy_no_cache 1;
+        proxy_cache_bypass 1;
+    }
+}
+EOF
+
+  run_sudo cp "$_tmp" "$_dest"
+  rm -f "$_tmp"
+  echo "Config aaPanel réécrite : $_dest"
+}
+
 patch_aapanel_qadus_vhosts() {
   local _dir _f _found=0
   local _main_conf="/www/server/panel/vhost/nginx/qadus.fr.conf"
@@ -262,11 +349,11 @@ verify_public_proxy() {
 }
 
 print_active_config() {
-  echo "=== Config active qadus ==="
+  echo "=== Config active qadus (nginx -T) ==="
   if [ "$NGINX_MODE" = "aapanel" ]; then
-    run_sudo grep -RInE 'server_name|proxy_pass|127\.0\.0\.1:300' \
-      /www/server/panel/vhost/nginx /www/server/nginx/conf 2>/dev/null \
-      | grep -i qadus | head -40 || true
+    run_sudo "$NGINX_BIN" -T -c "$NGINX_CONF" 2>/dev/null \
+      | grep -E 'server_name|proxy_pass|root |127\.0\.0\.1:300|# configuration file' \
+      | grep -i -B1 -A3 qadus | head -80 || true
   else
     run_sudo nginx -T 2>/dev/null | grep -E 'server_name|proxy_pass|127\.0\.0\.1:300' | grep -i qadus | head -40 || true
   fi
@@ -277,6 +364,8 @@ detect_nginx_env || exit 0
 echo "=== Configuration nginx Qadus → ${PROXY_TARGET} ==="
 
 if [ "$NGINX_MODE" = "aapanel" ]; then
+  disable_aapanel_qadus_extensions
+  write_aapanel_qadus_config
   patch_aapanel_qadus_vhosts
 else
   write_debian_site_config
