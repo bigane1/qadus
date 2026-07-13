@@ -189,7 +189,7 @@ reload_nginx() {
   return 1
 }
 
-body_has_new_version() { echo "$1" | grep -q "07 58 42 95 10"; }
+body_has_new_version() { echo "$1" | grep -q "06 67 25 08 85"; }
 
 curl_check() {
   local _label="$1"; shift

@@ -35,8 +35,18 @@ export const serviceImages = {
   },
   /** Réhabilitation réseau — chemisage CIPP sans tranchée */
   chemisage: {
-    src: pex(37627673),
-    alt: "Installation de canalisation en tranchée — réhabilitation réseau assainissement",
+    src: pex(8088496),
+    alt: "Canalisation en cours de réhabilitation sans tranchée",
+  },
+  /** Avant intervention chemisage */
+  chemisageBefore: {
+    src: pex(257736),
+    alt: "Canalisation vieillissante avec depots et fissures avant chemisage",
+  },
+  /** Après intervention chemisage */
+  chemisageAfter: {
+    src: pex(205316),
+    alt: "Canalisation restauree apres intervention de chemisage",
   },
   /** Réseaux EU/EV/EP — assainissement collectif et individuel */
   assainissement: {

@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { TEL_DISPLAY, telHref, whatsappHref } from "@/lib/contact";
+import { ADDRESS_DISPLAY, FACEBOOK_URL, TEL_DISPLAY, telHref, whatsappHref } from "@/lib/contact";
 
 const services = [
   "Débouchage / Dégorgement",
@@ -99,9 +99,16 @@ export default function Contact() {
               {
                 icon: "📍",
                 label: "Adresse",
-                value: "54 rue Sainte-Honorine, Bât D",
+                value: ADDRESS_DISPLAY,
                 href: "https://maps.google.com/?q=54+rue+Sainte-Honorine+78955+Carrieres-sous-Poissy",
                 sub: "78955 Carrières-sous-Poissy",
+              },
+              {
+                icon: "📘",
+                label: "Facebook",
+                value: "Suivre QADUS",
+                href: FACEBOOK_URL,
+                sub: "Actualités et réalisations",
               },
             ].map((c) => (
               <div

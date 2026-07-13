@@ -1,4 +1,4 @@
-import { TEL_DISPLAY, TEL_E164 } from "./contact";
+import { FACEBOOK_URL, TEL_DISPLAY, TEL_E164 } from "./contact";
 
 export const localBusinessSchema = {
   "@context": "https://schema.org",
@@ -15,7 +15,7 @@ export const localBusinessSchema = {
   taxID: "990 840 019",
   address: {
     "@type": "PostalAddress",
-    streetAddress: "54 rue Sainte-Honorine, Bât D Appt D109",
+    streetAddress: "54 rue Sainte-Honorine",
     addressLocality: "Carrières-sous-Poissy",
     postalCode: "78955",
     addressRegion: "Yvelines",
@@ -71,7 +71,7 @@ export const localBusinessSchema = {
       { "@type": "Offer", itemOffered: { "@type": "Service", name: "Fuite d'eau et dégât des eaux" } },
     ],
   },
-  sameAs: [],
+  sameAs: [FACEBOOK_URL],
 };
 
 export const faqSchema = {

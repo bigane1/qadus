@@ -1,8 +1,10 @@
 /** Numéro unique Qadus — appels et WhatsApp */
-export const TEL = "0758429510";
-export const TEL_DISPLAY = "07 58 42 95 10";
-export const TEL_E164 = "+33758429510";
-export const WHATSAPP_NUMBER = "33758429510";
+export const TEL = "0667250885";
+export const TEL_DISPLAY = "06 67 25 08 85";
+export const TEL_E164 = "+33667250885";
+export const WHATSAPP_NUMBER = "33667250885";
+export const FACEBOOK_URL = "https://www.facebook.com/share/1LAY4LR2By/?mibextid=wwXIfr";
+export const ADDRESS_DISPLAY = "54 rue Sainte-Honorine, 78955 Carrières-sous-Poissy";
 
 export const telHref = `tel:${TEL_E164}`;
 export const whatsappHref = (text = "Bonjour Qadus, j'ai besoin d'un devis pour ") =>

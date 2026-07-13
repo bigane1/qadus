@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { TEL_DISPLAY, telHref } from "@/lib/contact";
+import { FACEBOOK_URL, TEL_DISPLAY, telHref } from "@/lib/contact";
 
 const currentYear = new Date().getFullYear();
 
@@ -51,6 +51,14 @@ export default function Footer() {
               className="flex items-center gap-2 text-slate-400 hover:text-white transition-colors text-sm"
             >
               ✉️ qadus.paris@gmail.com
+            </a>
+            <a
+              href={FACEBOOK_URL}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="flex items-center gap-2 text-slate-400 hover:text-white transition-colors text-sm"
+            >
+              📘 Facebook QADUS
             </a>
             <span className="flex items-center gap-2 text-sm">
               📍 Carrières-sous-Poissy (78955)

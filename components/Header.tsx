@@ -3,7 +3,7 @@
 import { useState, useEffect } from "react";
 import Link from "next/link";
 import Image from "next/image";
-import { TEL_DISPLAY, telHref } from "@/lib/contact";
+import { TEL_DISPLAY, telHref, whatsappHref } from "@/lib/contact";
 
 const navLinks = [
   { href: "/debouchage", label: "Débouchage" },
@@ -11,6 +11,8 @@ const navLinks = [
   { href: "/chemisage", label: "Chemisage" },
   { href: "/inspection-camera", label: "Inspection caméra" },
   { href: "/assainissement", label: "Assainissement" },
+  { href: "/#tarifs", label: "Tarifs" },
+  { href: "/devis", label: "Devis" },
   { href: "/#contact", label: "Contact" },
 ];
 
@@ -54,7 +56,7 @@ export default function Header() {
             ))}
           </nav>
 
-          {/* CTA devis + tel */}
+          {/* CTA devis + whatsapp + tel */}
           <div className="hidden sm:flex items-center gap-2">
             <Link
               href="/devis"
@@ -62,6 +64,14 @@ export default function Header() {
             >
               Devis gratuit
             </Link>
+            <a
+              href={whatsappHref("Bonjour Qadus, j'ai besoin d'un devis rapide.")}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="text-sm font-semibold text-green-700 hover:text-green-900 border border-green-200 hover:border-green-400 px-3 py-2 rounded-xl transition-all"
+            >
+              WhatsApp
+            </a>
           <a
             href={telHref}
             className="flex items-center gap-2 bg-orange-500 hover:bg-orange-600 text-white font-bold px-4 py-2.5 rounded-xl transition-all hover:-translate-y-0.5 hover:shadow-lg hover:shadow-orange-200 text-sm lg:text-base"

@@ -40,8 +40,8 @@ if [ ! -f "$ROOT/lib/contact.ts" ]; then
   exit 1
 fi
 
-if ! grep -q "0758429510" "$ROOT/lib/contact.ts"; then
-  echo "::error::lib/contact.ts ne contient pas le numéro 07 58 42 95 10 — code obsolète sur le VPS"
+if ! grep -q "0667250885" "$ROOT/lib/contact.ts"; then
+  echo "::error::lib/contact.ts ne contient pas le numéro 06 67 25 08 85 — code obsolète sur le VPS"
   exit 1
 fi
 
@@ -88,7 +88,7 @@ for _attempt in 1 2 3 4 5 6 8 10; do
   _body="$(curl -sf --max-time 20 http://127.0.0.1:3002/ 2>/dev/null || true)"
   if [ -n "$_body" ]; then
     _http_ok=true
-    if echo "$_body" | grep -q "07 58 42 95 10"; then
+    if echo "$_body" | grep -q "06 67 25 08 85"; then
       _content_ok=true
       break
     fi
@@ -105,7 +105,7 @@ if [[ "$_http_ok" != true ]]; then
 fi
 
 if [[ "$_content_ok" != true ]]; then
-  echo "::error::Port 3002 répond mais le HTML ne contient pas 07 58 42 95 10"
+  echo "::error::Port 3002 répond mais le HTML ne contient pas 06 67 25 08 85"
   echo "Vérifiez qu'aucune autre app n'écoute sur 3002 : ss -tlnp | grep 3002"
   run_pm2 logs "$PM2_APP_NAME" --lines 50 --nostream 2>/dev/null || true
   exit 1

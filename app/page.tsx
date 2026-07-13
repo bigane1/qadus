@@ -4,6 +4,7 @@ import Hero from "@/components/Hero";
 import UrgenceBand from "@/components/UrgenceBand";
 import Stats from "@/components/Stats";
 import Services from "@/components/Services";
+import Tarifs from "@/components/Tarifs";
 import Process from "@/components/Process";
 import Engagements from "@/components/Engagements";
 import Clients from "@/components/Clients";
@@ -30,6 +31,7 @@ export default function Home() {
         <UrgenceBand />
         <Stats />
         <Services />
+        <Tarifs />
         <Process />
         <Engagements />
         <Clients />

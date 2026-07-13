@@ -137,6 +137,14 @@ export default function Hero() {
 
             </a>
 
+            <a
+              href="/devis"
+              className="flex items-center justify-center gap-2 bg-blue-700 hover:bg-blue-800 text-white font-bold px-8 py-4 rounded-2xl transition-all hover:-translate-y-1"
+            >
+              <span className="text-xl">📋</span>
+              Devis
+            </a>
+
           </div>
 
 

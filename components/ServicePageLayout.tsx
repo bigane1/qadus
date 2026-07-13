@@ -20,6 +20,11 @@ interface ServicePageLayoutProps {
   steps: { num: string; title: string; text: string }[];
   faqs: Faq[];
   relatedServices: { href: string; label: string; icon: string }[];
+  beforeAfter?: {
+    title: string;
+    before: { src: string; alt: string; label: string };
+    after: { src: string; alt: string; label: string };
+  };
 }
 
 export default function ServicePageLayout({
@@ -33,6 +38,7 @@ export default function ServicePageLayout({
   steps,
   faqs,
   relatedServices,
+  beforeAfter,
 }: ServicePageLayoutProps) {
   return (
     <>
@@ -136,6 +142,30 @@ export default function ServicePageLayout({
             </div>
           </div>
         </section>
+
+        {beforeAfter && (
+          <section className="py-16 px-4 bg-white">
+            <div className="max-w-6xl mx-auto">
+              <h2 className="text-3xl font-black text-slate-900 text-center mb-10">
+                {beforeAfter.title}
+              </h2>
+              <div className="grid md:grid-cols-2 gap-6">
+                <div className="bg-slate-50 border border-slate-200 rounded-2xl overflow-hidden">
+                  <img src={beforeAfter.before.src} alt={beforeAfter.before.alt} className="w-full h-72 object-cover" loading="lazy" />
+                  <div className="px-5 py-4">
+                    <p className="text-sm font-bold uppercase tracking-wide text-red-700">{beforeAfter.before.label}</p>
+                  </div>
+                </div>
+                <div className="bg-slate-50 border border-slate-200 rounded-2xl overflow-hidden">
+                  <img src={beforeAfter.after.src} alt={beforeAfter.after.alt} className="w-full h-72 object-cover" loading="lazy" />
+                  <div className="px-5 py-4">
+                    <p className="text-sm font-bold uppercase tracking-wide text-green-700">{beforeAfter.after.label}</p>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </section>
+        )}
 
         {/* FAQ */}
         <section className="py-16 px-4 bg-slate-50">
