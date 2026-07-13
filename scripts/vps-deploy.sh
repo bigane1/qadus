@@ -53,6 +53,9 @@ export NODE_ENV=production
 export PORT=3002
 PM2_APP_NAME="${PM2_APP_NAME:-qadus}"
 
+# shellcheck source=scripts/curl-check.sh
+source "$ROOT/scripts/curl-check.sh"
+
 run_pm2() {
   if command -v pm2 >/dev/null 2>&1; then
     pm2 "$@"
@@ -84,23 +87,6 @@ free_port() {
   fi
 }
 
-body_has_qadus_phone() {
-  echo "$1" | grep -qE "06 67 25 08 85|0667250885|tel:\+33667250885|\+33667250885"
-}
-
-body_version_hint() {
-  local _body="$1"
-  if body_has_qadus_phone "$_body"; then
-    echo "NOUVELLE"
-  elif echo "$_body" | grep -qE "07 58 42 95 10|07 61 91 62 22|0758429510|0761916222"; then
-    echo "ANCIENNE"
-  elif [ -n "$_body" ]; then
-    echo "INCONNUE"
-  else
-    echo "VIDE"
-  fi
-}
-
 echo "=== Arrêt des anciennes instances PM2 (qadus*) ==="
 run_pm2 delete "$PM2_APP_NAME" 2>/dev/null || true
 # Anciennes instances éventuelles lancées depuis un autre dossier
@@ -123,13 +109,17 @@ run_pm2 describe "$PM2_APP_NAME" 2>/dev/null | grep -E 'exec cwd|script path|sta
 echo "=== Vérification HTTP locale (port 3002) ==="
 _http_ok=false
 _content_ok=false
+_check_file="$(mktemp)"
+_check_url="http://127.0.0.1:3002/"
+trap 'rm -f "$_check_file"' EXIT
+
 for _attempt in 1 2 3 4 5 6 8 10; do
   sleep 5
-  _body="$(curl -sf --compressed --max-time 20 -H "Cache-Control: no-cache" "http://127.0.0.1:3002/?_deploy=$(date +%s)" 2>/dev/null || true)"
-  if [ -n "$_body" ]; then
+  _check_url="http://127.0.0.1:3002/?_deploy=$(date +%s)"
+  if curl_fetch_html -o "$_check_file" "$_check_url"; then
     _http_ok=true
-    _hint="$(body_version_hint "$_body")"
-    if body_has_qadus_phone "$_body"; then
+    _hint="$(body_version_hint_from_file "$_check_file")"
+    if grep -aqE "$QADUS_PHONE_PATTERN" "$_check_file"; then
       _content_ok=true
       break
     fi
@@ -147,7 +137,8 @@ fi
 
 if [[ "$_content_ok" != true ]]; then
   echo "::error::Port 3002 répond mais le HTML ne contient pas 06 67 25 08 85"
-  echo "Dernière version détectée: $(body_version_hint "$_body")"
+  echo "Dernière version détectée: $(body_version_hint_from_file "$_check_file")"
+  dump_html_debug "$_check_file" "$_check_url"
   echo "Processus sur 3002 :"
   ss -tlnp 2>/dev/null | grep 3002 || netstat -tlnp 2>/dev/null | grep 3002 || true
   run_pm2 logs "$PM2_APP_NAME" --lines 50 --nostream 2>/dev/null || true

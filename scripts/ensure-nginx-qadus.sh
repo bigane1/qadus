@@ -7,6 +7,9 @@ ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 QADUS_PORT=3002
 PROXY_TARGET="http://127.0.0.1:${QADUS_PORT}"
 
+# shellcheck source=scripts/curl-check.sh
+source "$ROOT/scripts/curl-check.sh"
+
 NGINX_MODE="debian"
 NGINX_BIN="nginx"
 NGINX_CONF=""
@@ -300,21 +303,30 @@ reload_nginx() {
   return 1
 }
 
-body_has_new_version() { echo "$1" | grep -qE "06 67 25 08 85|0667250885|tel:\+33667250885|\+33667250885"; }
+body_has_new_version() { grep -qE "$QADUS_PHONE_PATTERN" <<<"$1"; }
 
 body_has_old_version() {
-  echo "$1" | grep -qE "07 58 42 95 10|07 61 91 62 22|0758429510|0761916222"
+  grep -qE "$QADUS_OLD_PHONE_PATTERN" <<<"$1"
 }
 
 curl_check() {
   local _label="$1"; shift
-  local _raw _code _body
-  _raw="$(curl -sL --compressed --max-time 20 -w $'\n__HTTP_CODE__:%{http_code}' "$@" 2>/dev/null || true)"
-  _code="$(echo "$_raw" | sed -n 's/^__HTTP_CODE__://p' | tail -1)"
-  _body="$(echo "$_raw" | sed '/^__HTTP_CODE__:/d')"
-  echo "  $_label → HTTP ${_code:-?}, ${#_body} octets"
-  body_has_new_version "$_body" && echo "  $_label → NOUVELLE version" && return 0
-  body_has_old_version "$_body" && echo "  $_label → ANCIENNE version"
+  local _file _code
+  _file="$(mktemp)"
+  _code="$(curl -sL --max-time 20 -o "$_file" -w "%{http_code}" \
+    -H "Accept-Encoding: identity" \
+    -H "Cache-Control: no-cache" \
+    "$@" 2>/dev/null || echo "000")"
+  echo "  $_label → HTTP ${_code:-?}, $(wc -c < "$_file" | tr -d ' ') octets"
+  if grep -qE "$QADUS_PHONE_PATTERN" "$_file"; then
+    rm -f "$_file"
+    echo "  $_label → NOUVELLE version"
+    return 0
+  fi
+  if grep -qE "$QADUS_OLD_PHONE_PATTERN" "$_file"; then
+    echo "  $_label → ANCIENNE version"
+  fi
+  rm -f "$_file"
   return 1
 }
 

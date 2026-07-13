@@ -2,18 +2,9 @@
 # Diagnostic rapide Qadus sur le VPS — à lancer en SSH : bash scripts/vps-diagnose.sh
 set -uo pipefail
 
-check_version() {
-  local _body="$1"
-  if echo "$_body" | grep -qE "06 67 25 08 85|0667250885|tel:\+33667250885|\+33667250885"; then
-    echo "NOUVELLE"
-  elif echo "$_body" | grep -qE "07 58 42 95 10|07 61 91 62 22|0758429510|0761916222"; then
-    echo "ANCIENNE"
-  elif [ -n "$_body" ]; then
-    echo "INCONNUE"
-  else
-    echo "PAS DE REPONSE"
-  fi
-}
+ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
+# shellcheck source=scripts/curl-check.sh
+source "$ROOT/scripts/curl-check.sh"
 
 echo "========== Qadus VPS diagnostic =========="
 echo "Date: $(date -Is 2>/dev/null || date)"
@@ -43,17 +34,32 @@ fi
 
 echo
 echo "--- curl direct :3002 ---"
-_b="$(curl -sf --compressed --max-time 10 http://127.0.0.1:3002/ 2>/dev/null || true)"
-echo "3002 → $(check_version "$_b")"
+_check="$(mktemp)"
+if curl_fetch_html -o "$_check" "http://127.0.0.1:3002/"; then
+  echo "3002 → $(body_version_hint_from_file "$_check")"
+  dump_html_debug "$_check" "http://127.0.0.1:3002/"
+else
+  echo "3002 → PAS DE REPONSE"
+fi
+rm -f "$_check"
 
 echo
 echo "--- curl via nginx ---"
-for args in \
-  '-H "Host: www.qadus.fr" http://127.0.0.1/' \
-  '--resolve "www.qadus.fr:443:127.0.0.1" https://www.qadus.fr/'; do
-  _n="$(eval curl -sL --compressed --max-time 10 $args 2>/dev/null || true)"
-  echo "$args → $(check_version "$_n")"
-done
+_n="$(mktemp)"
+if curl_fetch_html -o "$_n" -H "Host: www.qadus.fr" "http://127.0.0.1/"; then
+  echo 'nginx HTTP Host:www.qadus.fr → '"$(body_version_hint_from_file "$_n")"
+else
+  echo "nginx HTTP Host:www.qadus.fr → PAS DE REPONSE"
+fi
+rm -f "$_n"
+
+_n="$(mktemp)"
+if curl_fetch_html -o "$_n" --resolve "www.qadus.fr:443:127.0.0.1" "https://www.qadus.fr/"; then
+  echo 'nginx HTTPS www.qadus.fr → '"$(body_version_hint_from_file "$_n")"
+else
+  echo "nginx HTTPS www.qadus.fr → PAS DE REPONSE"
+fi
+rm -f "$_n"
 
 echo
 echo "--- nginx qadus (aaPanel + debian) ---"
