@@ -3,6 +3,7 @@
 import { useEffect, useState } from "react";
 import type { SiteContent, BlogPostContent, PrestationPage } from "@/lib/site-content";
 import { ImageField, Field } from "@/components/admin/ImageField";
+import { SaveButton } from "@/components/admin/SaveButton";
 
 const TABS = [
   { id: "general", label: "Général" },
@@ -20,7 +21,7 @@ export default function AdminClient() {
   const [password, setPassword] = useState("");
   const [authState, setAuthState] = useState<"checking" | "guest" | "authed">("checking");
   const [content, setContent] = useState<SiteContent | null>(null);
-  const [message, setMessage] = useState("");
+  const [loginMessage, setLoginMessage] = useState("");
   const [tab, setTab] = useState<TabId>("general");
   const [prestationIndex, setPrestationIndex] = useState(0);
 
@@ -42,21 +43,33 @@ export default function AdminClient() {
       body: JSON.stringify({ password }),
     });
     if (!res.ok) {
-      setMessage("Mot de passe incorrect.");
+      setLoginMessage("Mot de passe incorrect.");
       return;
     }
-    setMessage("");
+    setLoginMessage("");
     await loadContent();
   };
 
-  const save = async () => {
-    if (!content) return;
-    const res = await fetch("/api/admin/content", {
-      method: "PUT",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(content),
-    });
-    setMessage(res.ok ? "Contenu enregistré avec succès." : "Erreur lors de l'enregistrement.");
+  const persistContent = async (): Promise<{ ok: boolean; error?: string }> => {
+    if (!content) return { ok: false, error: "Contenu non chargé." };
+    try {
+      const res = await fetch("/api/admin/content", {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(content),
+      });
+      const data = (await res.json().catch(() => ({}))) as {
+        error?: string;
+        content?: SiteContent;
+      };
+      if (!res.ok) {
+        return { ok: false, error: data.error ?? `Erreur serveur (${res.status})` };
+      }
+      if (data.content) setContent(data.content);
+      return { ok: true };
+    } catch {
+      return { ok: false, error: "Erreur réseau — vérifiez votre connexion." };
+    }
   };
 
   useEffect(() => {
@@ -96,7 +109,7 @@ export default function AdminClient() {
           <button onClick={login} className="w-full bg-blue-700 hover:bg-blue-800 text-white font-bold py-3 rounded-xl">
             Connexion
           </button>
-          {message && <p className="text-sm text-red-600 mt-3">{message}</p>}
+          {loginMessage && <p className="text-sm text-red-600 mt-3">{loginMessage}</p>}
         </div>
       </main>
     );
@@ -118,11 +131,10 @@ export default function AdminClient() {
         <div className="p-6 border-b border-slate-100 flex flex-col md:flex-row md:items-center justify-between gap-4">
           <div>
             <h1 className="text-3xl font-black text-slate-900">Backoffice Qadus</h1>
-            <p className="text-slate-500 text-sm mt-1">Modifier textes, images, prestations, blog et tarifs</p>
+            <p className="text-slate-500 text-sm mt-1">
+              Modifiez une section puis cliquez « Enregistrer cette section »
+            </p>
           </div>
-          <button onClick={save} className="bg-blue-700 hover:bg-blue-800 text-white font-bold px-6 py-3 rounded-xl">
-            Enregistrer tout
-          </button>
         </div>
 
         <div className="flex flex-wrap gap-2 p-4 border-b border-slate-100 bg-slate-50">
@@ -141,6 +153,7 @@ export default function AdminClient() {
 
         <div className="p-6 space-y-6 max-h-[70vh] overflow-y-auto">
           {tab === "general" && (
+            <>
             <div className="grid md:grid-cols-2 gap-4">
               <Field label="Téléphone (brut)" value={content.phone} onChange={(v) => setContent({ ...content, phone: v })} />
               <Field label="Téléphone (affichage)" value={content.phoneDisplay} onChange={(v) => setContent({ ...content, phoneDisplay: v })} />
@@ -149,15 +162,20 @@ export default function AdminClient() {
               <Field label="Titre hero accueil" value={content.heroTitle} onChange={(v) => setContent({ ...content, heroTitle: v })} />
               <Field label="Sous-titre hero" value={content.heroSubtitle} onChange={(v) => setContent({ ...content, heroSubtitle: v })} />
             </div>
+            <SaveButton label="Enregistrer — Général" onSave={persistContent} />
+            </>
           )}
 
           {tab === "images" && (
+            <>
             <div className="grid md:grid-cols-2 gap-6">
               <ImageField label="Image hero accueil" value={content.images.hero} onChange={(v) => setContent({ ...content, images: { ...content.images, hero: v } })} altValue={content.images.heroAlt} onAltChange={(v) => setContent({ ...content, images: { ...content.images, heroAlt: v } })} />
               <ImageField label="Logo" value={content.images.logo} onChange={(v) => setContent({ ...content, images: { ...content.images, logo: v } })} />
               <ImageField label="Chemisage AVANT" value={content.images.chemisageBefore} onChange={(v) => setContent({ ...content, images: { ...content.images, chemisageBefore: v } })} altValue={content.images.chemisageBeforeAlt} onAltChange={(v) => setContent({ ...content, images: { ...content.images, chemisageBeforeAlt: v } })} />
               <ImageField label="Chemisage APRÈS" value={content.images.chemisageAfter} onChange={(v) => setContent({ ...content, images: { ...content.images, chemisageAfter: v } })} altValue={content.images.chemisageAfterAlt} onAltChange={(v) => setContent({ ...content, images: { ...content.images, chemisageAfterAlt: v } })} />
             </div>
+            <SaveButton label="Enregistrer — Images" onSave={persistContent} />
+            </>
           )}
 
           {tab === "services" && (
@@ -184,6 +202,7 @@ export default function AdminClient() {
                 </div>
               ))}
               <button type="button" className="text-blue-700 font-semibold" onClick={() => setContent({ ...content, services: [...content.services, { title: "", desc: "", tag: "", icon: "🔧", href: "/", image: "", imageAlt: "" }] })}>+ Ajouter une prestation accueil</button>
+              <SaveButton label="Enregistrer — Prestations accueil" onSave={persistContent} />
             </>
           )}
 
@@ -216,6 +235,7 @@ export default function AdminClient() {
                   <textarea className="w-full border rounded px-2 py-1" rows={2} value={f.a} onChange={(e) => { const faqs = [...p.faqs]; faqs[fi] = { ...f, a: e.target.value }; updatePrestation(prestationIndex, { faqs }); }} />
                 </div>
               ))}
+              <SaveButton label="Enregistrer — Page prestation" onSave={persistContent} />
             </>
           )}
 
@@ -236,6 +256,7 @@ export default function AdminClient() {
                 </div>
               ))}
               <button type="button" className="text-blue-700 font-semibold" onClick={() => setContent({ ...content, tarifs: [...content.tarifs, { title: "", price: "", desc: "", image: "" }] })}>+ Ajouter un tarif</button>
+              <SaveButton label="Enregistrer — Tarifs" onSave={persistContent} />
             </>
           )}
 
@@ -290,10 +311,12 @@ export default function AdminClient() {
               >
                 + Ajouter un article
               </button>
+              <SaveButton label="Enregistrer — Blog" onSave={persistContent} />
             </>
           )}
 
           {tab === "about" && (
+            <>
             <div className="space-y-4">
               <Field label="Badge" value={content.about.badge} onChange={(v) => setContent({ ...content, about: { ...content.about, badge: v } })} />
               <Field label="Titre page" value={content.about.title} onChange={(v) => setContent({ ...content, about: { ...content.about, title: v } })} />
@@ -320,10 +343,10 @@ export default function AdminClient() {
               <Field label="Adresse affichée" value={content.about.locationText} onChange={(v) => setContent({ ...content, about: { ...content.about, locationText: v } })} />
               <Field label="Zone d'intervention" value={content.about.zoneText} onChange={(v) => setContent({ ...content, about: { ...content.about, zoneText: v } })} textarea />
             </div>
+            <SaveButton label="Enregistrer — Qui sommes-nous" onSave={persistContent} />
+            </>
           )}
         </div>
-
-        {message && <p className="px-6 pb-6 text-sm text-slate-600">{message}</p>}
       </div>
     </main>
   );

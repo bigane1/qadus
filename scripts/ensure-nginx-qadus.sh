@@ -125,6 +125,13 @@ server {
 
     client_max_body_size 10M;
 
+    location /uploads/ {
+        alias ${ROOT}/public/uploads/;
+        expires 30d;
+        add_header Cache-Control "public";
+        access_log off;
+    }
+
     location /_next/static/ {
         proxy_pass ${PROXY_TARGET};
         proxy_http_version 1.1;

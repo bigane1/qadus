@@ -103,9 +103,17 @@ jobs:
               fi
             fi
             cd "$APP_DIR"
+            if [ -f "$APP_DIR/data/site-content.json" ]; then
+              cp "$APP_DIR/data/site-content.json" /tmp/qadus-site-content.backup.json
+              echo "=== Sauvegarde site-content.json ==="
+            fi
             git fetch origin main
             git checkout main
             git reset --hard "${{ github.sha }}"
+            if [ -f /tmp/qadus-site-content.backup.json ]; then
+              cp /tmp/qadus-site-content.backup.json "$APP_DIR/data/site-content.json"
+              echo "=== Restauration site-content.json ==="
+            fi
             echo "=== Commit VPS après reset : $(git rev-parse HEAD) ==="
             bash scripts/vps-deploy.sh
 

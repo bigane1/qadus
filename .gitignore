@@ -46,3 +46,6 @@ next-env.d.ts
 # admin uploads (keep folder)
 /public/uploads/*
 !/public/uploads/.gitkeep
+
+# contenu éditable en production (ne pas écraser au deploy)
+/data/site-content.json

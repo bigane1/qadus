@@ -13,32 +13,76 @@ type Props = {
 export function ImageField({ label, value, onChange, altValue, onAltChange }: Props) {
   const inputRef = useRef<HTMLInputElement>(null);
   const [uploading, setUploading] = useState(false);
+  const [feedback, setFeedback] = useState<{ type: "ok" | "err"; text: string } | null>(null);
+  const [previewKey, setPreviewKey] = useState(0);
+
+  const previewSrc = value
+    ? `${value}${value.includes("?") ? "&" : "?"}v=${previewKey}`
+    : "";
 
   const upload = async (file: File) => {
     setUploading(true);
-    const form = new FormData();
-    form.append("file", file);
-    const res = await fetch("/api/admin/upload", { method: "POST", body: form });
-    setUploading(false);
-    if (res.ok) {
-      const data = await res.json();
+    setFeedback(null);
+    try {
+      const form = new FormData();
+      form.append("file", file);
+      const res = await fetch("/api/admin/upload", { method: "POST", body: form });
+      const data = (await res.json().catch(() => ({}))) as { url?: string; error?: string };
+      if (!res.ok) {
+        setFeedback({ type: "err", text: data.error ?? `Échec upload (${res.status})` });
+        return;
+      }
+      if (!data.url) {
+        setFeedback({ type: "err", text: "Réponse serveur invalide." });
+        return;
+      }
       onChange(data.url);
+      setPreviewKey((k) => k + 1);
+      setFeedback({
+        type: "ok",
+        text: "Image uploadée — cliquez « Enregistrer cette section » pour publier.",
+      });
+    } catch {
+      setFeedback({ type: "err", text: "Erreur réseau lors de l'upload." });
+    } finally {
+      setUploading(false);
+      if (inputRef.current) inputRef.current.value = "";
     }
   };
 
   return (
     <div className="space-y-2">
       <label className="text-sm font-semibold block">{label}</label>
-      {value && (
-        <img src={value} alt="" className="h-24 w-full object-cover rounded-lg border" />
+      {value ? (
+        <div className="relative rounded-lg border overflow-hidden bg-slate-50">
+          {/* eslint-disable-next-line @next/next/no-img-element */}
+          <img
+            src={previewSrc}
+            alt={altValue ?? ""}
+            className="h-32 w-full object-cover"
+            onError={() =>
+              setFeedback({
+                type: "err",
+                text: "Aperçu indisponible — enregistrez puis vérifiez que le fichier existe dans /uploads.",
+              })
+            }
+          />
+        </div>
+      ) : (
+        <div className="h-32 rounded-lg border border-dashed border-slate-300 bg-slate-50 flex items-center justify-center text-sm text-slate-400">
+          Aucune image
+        </div>
       )}
       <input
         className="w-full border rounded-lg px-3 py-2 text-sm"
         value={value}
-        onChange={(e) => onChange(e.target.value)}
+        onChange={(e) => {
+          onChange(e.target.value);
+          setPreviewKey((k) => k + 1);
+        }}
         placeholder="URL image ou /uploads/..."
       />
-      <div className="flex gap-2">
+      <div className="flex flex-wrap gap-2 items-center">
         <button
           type="button"
           onClick={() => inputRef.current?.click()}
@@ -58,6 +102,13 @@ export function ImageField({ label, value, onChange, altValue, onAltChange }: Pr
           }}
         />
       </div>
+      {feedback && (
+        <p
+          className={`text-xs font-medium ${feedback.type === "ok" ? "text-green-700" : "text-red-600"}`}
+        >
+          {feedback.text}
+        </p>
+      )}
       {onAltChange && (
         <input
           className="w-full border rounded-lg px-3 py-2 text-sm"

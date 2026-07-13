@@ -46,6 +46,8 @@ if ! grep -q "0667250885" "$ROOT/lib/contact.ts"; then
 fi
 
 echo "=== Build Next.js ==="
+mkdir -p "$ROOT/public/uploads" "$ROOT/data"
+chmod 775 "$ROOT/public/uploads" "$ROOT/data" 2>/dev/null || true
 npm ci --include=dev
 npm run build
 

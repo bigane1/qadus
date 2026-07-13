@@ -321,7 +321,7 @@ export const defaultSiteContent: SiteContent = {
   },
 };
 
-function mergeSiteContent(raw: Partial<SiteContent>): SiteContent {
+export function mergeSiteContent(raw: Partial<SiteContent>): SiteContent {
   return {
     ...defaultSiteContent,
     ...raw,
