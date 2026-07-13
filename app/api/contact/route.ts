@@ -66,7 +66,7 @@ export async function POST(req: NextRequest) {
 
     await transporter.sendMail({
       from: `"Qadus - Formulaire" <${process.env.SMTP_USER}>`,
-      to: process.env.SMTP_TO || "qadus.paris@gmail.com",
+      to: process.env.SMTP_TO || "contact@qadus.fr",
       replyTo: undefined,
       subject: `[Qadus] Demande de devis — ${prenom} ${nom} (${ville || "?"})`,
       html,

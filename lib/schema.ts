@@ -10,7 +10,7 @@ export const localBusinessSchema = {
   description:
     "Qadus — Spécialiste débouchage, assainissement et réhabilitation de canalisations en Île-de-France. Chemisage sans tranchée, inspection caméra, curage, hydrocurage, bacs à graisse, postes de relevage. Intervention 24h/24 7j/7.",
   telephone: TEL_E164,
-  email: "qadus.paris@gmail.com",
+  email: "contact@qadus.fr",
   vatID: "FR99990840019",
   taxID: "990 840 019",
   address: {

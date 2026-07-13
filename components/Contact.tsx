@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { ADDRESS_DISPLAY, FACEBOOK_URL, TEL_DISPLAY, telHref, whatsappHref } from "@/lib/contact";
+import { ADDRESS_DISPLAY, FACEBOOK_URL, EMAIL, TEL_DISPLAY, mailtoHref, telHref, whatsappHref } from "@/lib/contact";
 
 const services = [
   "Débouchage / Dégorgement",
@@ -92,8 +92,8 @@ export default function Contact() {
               {
                 icon: "📧",
                 label: "Email",
-                value: "qadus.paris@gmail.com",
-                href: "mailto:qadus.paris@gmail.com",
+                value: EMAIL,
+                href: mailtoHref,
                 sub: "Réponse sous 2h",
               },
               {

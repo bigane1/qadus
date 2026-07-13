@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 import Link from "next/link";
-import { ADDRESS_DISPLAY, TEL_DISPLAY } from "@/lib/contact";
+import { ADDRESS_DISPLAY, EMAIL, TEL_DISPLAY, mailtoHref } from "@/lib/contact";
 
 export const metadata: Metadata = {
   title: "Mentions légales",
@@ -25,7 +25,7 @@ export default function MentionsLegales() {
             <li><strong>Code APE :</strong> 43.22A — Travaux d&apos;installation d&apos;eau et de gaz en tous locaux</li>
             <li><strong>Adresse :</strong> {ADDRESS_DISPLAY}</li>
             <li><strong>Téléphone :</strong> {TEL_DISPLAY}</li>
-            <li><strong>Email :</strong> <a href="mailto:qadus.paris@gmail.com" className="text-blue-700 hover:underline">qadus.paris@gmail.com</a></li>
+            <li><strong>Email :</strong> <a href={mailtoHref} className="text-blue-700 hover:underline">{EMAIL}</a></li>
             <li><strong>Date de création :</strong> 02 septembre 2025</li>
           </ul>
         </div>

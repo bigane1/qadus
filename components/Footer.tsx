@@ -1,6 +1,6 @@
 import Link from "next/link";
 import Image from "next/image";
-import { FACEBOOK_URL, TEL_DISPLAY, telHref } from "@/lib/contact";
+import { FACEBOOK_URL, EMAIL, TEL_DISPLAY, mailtoHref, telHref } from "@/lib/contact";
 
 const currentYear = new Date().getFullYear();
 
@@ -53,10 +53,10 @@ export default function Footer() {
               📞 {TEL_DISPLAY}
             </a>
             <a
-              href="mailto:contact@qadus.fr"
+              href={mailtoHref}
               className="flex items-center gap-2 text-slate-400 hover:text-white transition-colors text-sm"
             >
-              ✉️ qadus.paris@gmail.com
+              ✉️ {EMAIL}
             </a>
             <a
               href={FACEBOOK_URL}
