@@ -63,6 +63,44 @@ run_pm2() {
   fi
 }
 
+free_port() {
+  local port="$1"
+  echo "=== Libération du port $port ==="
+  if command -v fuser >/dev/null 2>&1; then
+    fuser -k "${port}/tcp" 2>/dev/null || true
+  elif command -v lsof >/dev/null 2>&1; then
+    local pids
+    pids="$(lsof -t -i:"${port}" 2>/dev/null || true)"
+    if [ -n "$pids" ]; then
+      kill -9 $pids 2>/dev/null || true
+    fi
+  fi
+  sleep 2
+  if ss -tlnp 2>/dev/null | grep -q ":${port} "; then
+    echo "::warning::Le port $port est encore occupé après libération"
+    ss -tlnp 2>/dev/null | grep ":${port} " || true
+  else
+    echo "Port $port libre"
+  fi
+}
+
+body_has_qadus_phone() {
+  echo "$1" | grep -qE "06 67 25 08 85|0667250885"
+}
+
+body_version_hint() {
+  local _body="$1"
+  if body_has_qadus_phone "$_body"; then
+    echo "NOUVELLE"
+  elif echo "$_body" | grep -qE "07 58 42 95 10|07 61 91 62 22|0758429510|0761916222"; then
+    echo "ANCIENNE"
+  elif [ -n "$_body" ]; then
+    echo "INCONNUE"
+  else
+    echo "VIDE"
+  fi
+}
+
 echo "=== Arrêt des anciennes instances PM2 (qadus*) ==="
 run_pm2 delete "$PM2_APP_NAME" 2>/dev/null || true
 # Anciennes instances éventuelles lancées depuis un autre dossier
@@ -72,6 +110,8 @@ done < <(run_pm2 jlist 2>/dev/null | node -e "
 const d=JSON.parse(require('fs').readFileSync(0,'utf8')||'[]');
 d.filter(p=>/qadus/i.test(p.name)).map(p=>p.pm_id).forEach(id=>console.log(id));
 " 2>/dev/null || true)
+
+free_port 3002
 
 echo "=== Démarrage PM2 depuis $ROOT ==="
 run_pm2 start "$ROOT/ecosystem.config.cjs" --update-env
@@ -85,14 +125,15 @@ _http_ok=false
 _content_ok=false
 for _attempt in 1 2 3 4 5 6 8 10; do
   sleep 5
-  _body="$(curl -sf --max-time 20 http://127.0.0.1:3002/ 2>/dev/null || true)"
+  _body="$(curl -sf --max-time 20 -H "Cache-Control: no-cache" "http://127.0.0.1:3002/?_deploy=$(date +%s)" 2>/dev/null || true)"
   if [ -n "$_body" ]; then
     _http_ok=true
-    if echo "$_body" | grep -q "06 67 25 08 85"; then
+    _hint="$(body_version_hint "$_body")"
+    if body_has_qadus_phone "$_body"; then
       _content_ok=true
       break
     fi
-    echo "tentative $_attempt : HTTP OK mais ancien contenu encore servi..."
+    echo "tentative $_attempt : HTTP OK — version détectée: $_hint"
   else
     echo "tentative $_attempt : pas de réponse sur :3002"
   fi
@@ -106,7 +147,9 @@ fi
 
 if [[ "$_content_ok" != true ]]; then
   echo "::error::Port 3002 répond mais le HTML ne contient pas 06 67 25 08 85"
-  echo "Vérifiez qu'aucune autre app n'écoute sur 3002 : ss -tlnp | grep 3002"
+  echo "Dernière version détectée: $(body_version_hint "$_body")"
+  echo "Processus sur 3002 :"
+  ss -tlnp 2>/dev/null | grep 3002 || netstat -tlnp 2>/dev/null | grep 3002 || true
   run_pm2 logs "$PM2_APP_NAME" --lines 50 --nostream 2>/dev/null || true
   exit 1
 fi
