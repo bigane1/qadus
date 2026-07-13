@@ -60,9 +60,22 @@ export default function AdminClient() {
   };
 
   useEffect(() => {
-    loadContent().then((ok) => {
-      if (!ok) setAuthState("guest");
-    });
+    let cancelled = false;
+
+    void (async () => {
+      const res = await fetch("/api/admin/content");
+      if (cancelled) return;
+      if (!res.ok) {
+        setAuthState("guest");
+        return;
+      }
+      setContent(await res.json());
+      setAuthState("authed");
+    })();
+
+    return () => {
+      cancelled = true;
+    };
   }, []);
 
   if (authState === "checking") return <main className="p-8">Chargement...</main>;
