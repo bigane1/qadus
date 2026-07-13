@@ -110,6 +110,7 @@ jobs:
             git fetch origin main
             git checkout main
             git reset --hard "${{ github.sha }}"
+            mkdir -p "$APP_DIR/data" "$APP_DIR/public/uploads"
             if [ -f /tmp/qadus-site-content.backup.json ]; then
               cp /tmp/qadus-site-content.backup.json "$APP_DIR/data/site-content.json"
               echo "=== Restauration site-content.json ==="
