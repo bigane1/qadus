@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import nodemailer from "nodemailer";
+import { EMAIL } from "@/lib/contact";
 
 export async function POST(req: NextRequest) {
   try {
@@ -13,16 +14,25 @@ export async function POST(req: NextRequest) {
       );
     }
 
+    const smtpUser = process.env.SMTP_USER;
+    const smtpPass = process.env.SMTP_PASS;
+    if (!smtpUser || !smtpPass) {
+      console.error("[/api/contact] SMTP_USER ou SMTP_PASS manquant");
+      return NextResponse.json(
+        { error: "Envoi email non configuré sur le serveur." },
+        { status: 500 }
+      );
+    }
+
     const transporter = nodemailer.createTransport({
       host: process.env.SMTP_HOST || "smtp.gmail.com",
       port: Number(process.env.SMTP_PORT) || 587,
       secure: false,
       auth: {
-        user: process.env.SMTP_USER,
-        pass: process.env.SMTP_PASS,
+        user: smtpUser,
+        pass: smtpPass,
       },
     });
-
     const html = `
       <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
         <div style="background: #1e40af; color: white; padding: 24px; border-radius: 8px 8px 0 0;">
@@ -65,13 +75,12 @@ export async function POST(req: NextRequest) {
     `;
 
     await transporter.sendMail({
-      from: `"Qadus - Formulaire" <${process.env.SMTP_USER}>`,
-      to: process.env.SMTP_TO || "contact@qadus.fr",
-      replyTo: undefined,
+      from: { name: "Qadus — Formulaire", address: smtpUser },
+      to: process.env.SMTP_TO || smtpUser,
+      replyTo: EMAIL,
       subject: `[Qadus] Demande de devis — ${prenom} ${nom} (${ville || "?"})`,
       html,
     });
-
     return NextResponse.json({ success: true });
   } catch (err) {
     console.error("[/api/contact]", err);
