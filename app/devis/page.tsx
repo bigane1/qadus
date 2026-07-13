@@ -47,7 +47,7 @@ export default function DevisPage() {
 
         <section className="py-14 px-4 bg-white">
           <div className="max-w-4xl mx-auto text-center">
-            <h2 className="text-2xl font-black text-slate-900 mb-3">Besoin d'informations rapides ?</h2>
+            <h2 className="text-2xl font-black text-slate-900 mb-3">Besoin d&apos;informations rapides ?</h2>
             <p className="text-slate-500 mb-6">Consultez nos prestations détaillées ou nos tarifs indicatifs.</p>
             <div className="flex flex-wrap justify-center gap-3">
               <Link href="/#services" className="bg-slate-100 hover:bg-slate-200 text-slate-800 font-semibold px-4 py-2 rounded-lg">

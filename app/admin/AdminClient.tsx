@@ -5,18 +5,18 @@ import type { SiteContent } from "@/lib/site-content";
 
 export default function AdminClient() {
   const [password, setPassword] = useState("");
-  const [loggedIn, setLoggedIn] = useState(false);
+  const [authState, setAuthState] = useState<"checking" | "guest" | "authed">("checking");
   const [content, setContent] = useState<SiteContent | null>(null);
   const [message, setMessage] = useState("");
 
   const loadContent = async () => {
     const res = await fetch("/api/admin/content");
     if (!res.ok) {
-      setLoggedIn(false);
+      setAuthState("guest");
       return false;
     }
     setContent(await res.json());
-    setLoggedIn(true);
+    setAuthState("authed");
     return true;
   };
 
@@ -45,10 +45,32 @@ export default function AdminClient() {
   };
 
   useEffect(() => {
-    loadContent().catch(() => setLoggedIn(false));
+    let cancelled = false;
+
+    fetch("/api/admin/content")
+      .then(async (res) => {
+        if (cancelled) return;
+        if (!res.ok) {
+          setAuthState("guest");
+          return;
+        }
+        setContent(await res.json());
+        setAuthState("authed");
+      })
+      .catch(() => {
+        if (!cancelled) setAuthState("guest");
+      });
+
+    return () => {
+      cancelled = true;
+    };
   }, []);
 
-  if (!loggedIn) {
+  if (authState === "checking") {
+    return <main className="p-8">Chargement...</main>;
+  }
+
+  if (authState === "guest") {
     return (
       <main className="min-h-screen bg-slate-100 flex items-center justify-center p-4">
         <div className="bg-white border border-slate-200 rounded-2xl p-6 w-full max-w-md">
