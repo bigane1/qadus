@@ -113,7 +113,7 @@ fi
 
 echo "=== OK : nouvelle version active sur port 3002 (commit $DEPLOY_SHORT) ==="
 
-if command -v nginx >/dev/null 2>&1; then
+if command -v nginx >/dev/null 2>&1 || [ -x /www/server/nginx/sbin/nginx ]; then
   bash "$ROOT/scripts/ensure-nginx-qadus.sh"
 else
   echo "⚠ nginx absent — le site public peut encore pointer vers un ancien port"

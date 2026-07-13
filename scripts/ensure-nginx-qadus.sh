@@ -175,12 +175,21 @@ reload_nginx() {
     run_sudo "$NGINX_BIN" -t 2>&1
   fi
 
+  if [ -n "$NGINX_CONF" ]; then
+    echo "Reload aaPanel : ${NGINX_BIN} -s reload"
+    if run_sudo "$NGINX_BIN" -s reload -c "$NGINX_CONF" 2>&1; then
+      sleep 1
+      echo "=== nginx rechargé (reload) ==="
+      return 0
+    fi
+  fi
+
   local _master=""
   if _master="$(get_nginx_master_pid)"; then
     echo "Reload nginx master PID ${_master} (kill -HUP)"
     run_sudo kill -HUP "$_master"
     sleep 1
-    echo "=== nginx rechargé ==="
+    echo "=== nginx rechargé (HUP) ==="
     return 0
   fi
 
@@ -189,7 +198,11 @@ reload_nginx() {
   return 1
 }
 
-body_has_new_version() { echo "$1" | grep -q "06 67 25 08 85"; }
+body_has_new_version() { echo "$1" | grep -qE "06 67 25 08 85|0667250885"; }
+
+body_has_old_version() {
+  echo "$1" | grep -qE "07 58 42 95 10|07 61 91 62 22|0758429510|0761916222"
+}
 
 curl_check() {
   local _label="$1"; shift
@@ -199,7 +212,7 @@ curl_check() {
   _body="$(echo "$_raw" | sed '/^__HTTP_CODE__:/d')"
   echo "  $_label → HTTP ${_code:-?}, ${#_body} octets"
   body_has_new_version "$_body" && echo "  $_label → NOUVELLE version" && return 0
-  echo "$_body" | grep -q "07 61 91 62 22" && echo "  $_label → ANCIENNE version"
+  body_has_old_version "$_body" && echo "  $_label → ANCIENNE version"
   return 1
 }
 

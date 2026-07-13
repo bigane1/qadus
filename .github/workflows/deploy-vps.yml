@@ -114,11 +114,11 @@ jobs:
           echo "=== Vérification du numéro 06 67 25 08 85 sur https://www.qadus.fr/ ==="
           for attempt in 1 2 3 4 5 6; do
             body=$(curl -sL --max-time 20 https://www.qadus.fr/ || true)
-            if echo "$body" | grep -q "06 67 25 08 85"; then
+            if echo "$body" | grep -qE "06 67 25 08 85|0667250885"; then
               echo "=== OK : nouvelle version déployée (tentative $attempt) ==="
               exit 0
             fi
-            if echo "$body" | grep -q "07 61 91 62 22"; then
+            if echo "$body" | grep -qE "07 58 42 95 10|07 61 91 62 22"; then
               echo "tentative $attempt : ancienne version encore visible..."
             else
               echo "tentative $attempt : réponse inattendue"
