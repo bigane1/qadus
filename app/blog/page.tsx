@@ -4,13 +4,9 @@ import BlogCard from "@/components/BlogCard";
 import BlogSidebar from "@/components/BlogSidebar";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
-import {
-  BLOG_CATEGORIES,
-  getAllPosts,
-  getPostsByCategory,
-  POSTS_PER_PAGE,
-  type BlogCategory,
-} from "@/lib/blog";
+import { BLOG_CATEGORIES, getAllPosts, getPostsByCategory, POSTS_PER_PAGE, type BlogCategory } from "@/lib/blog";
+
+export const dynamic = "force-dynamic";
 
 export const metadata: Metadata = {
   title: "Blog — Conseils & réalisations assainissement | Qadus",

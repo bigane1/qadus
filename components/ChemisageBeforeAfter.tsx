@@ -1,4 +1,4 @@
-import { serviceImages } from "@/lib/images";
+import { getContentImages } from "@/lib/content-images";
 
 type Props = {
   title?: string;
@@ -13,6 +13,7 @@ export default function ChemisageBeforeAfter({
   compact = false,
   className = "",
 }: Props) {
+  const images = getContentImages();
   const imageHeight = compact ? "h-40" : "h-56 md:h-72";
 
   return (
@@ -32,8 +33,8 @@ export default function ChemisageBeforeAfter({
         <div className="bg-white border border-slate-200 rounded-2xl overflow-hidden shadow-sm">
           <div className={`relative ${imageHeight} bg-slate-900 overflow-hidden`}>
             <img
-              src={serviceImages.chemisageBefore.src}
-              alt={serviceImages.chemisageBefore.alt}
+              src={images.chemisageBefore.src}
+              alt={images.chemisageBefore.alt}
               className="w-full h-full object-cover object-center scale-110"
               loading="lazy"
             />
@@ -57,8 +58,8 @@ export default function ChemisageBeforeAfter({
         <div className="bg-white border border-slate-200 rounded-2xl overflow-hidden shadow-sm">
           <div className={`relative ${imageHeight} bg-slate-900 overflow-hidden`}>
             <img
-              src={serviceImages.chemisageAfter.src}
-              alt={serviceImages.chemisageAfter.alt}
+              src={images.chemisageAfter.src}
+              alt={images.chemisageAfter.alt}
               className="w-full h-full object-cover object-center scale-110"
               loading="lazy"
             />

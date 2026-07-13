@@ -16,6 +16,8 @@ import Contact from "@/components/Contact";
 import Footer from "@/components/Footer";
 import FloatingCTA from "@/components/FloatingCTA";
 
+export const dynamic = "force-dynamic";
+
 export default function Home() {
   return (
     <>

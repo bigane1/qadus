@@ -1,4 +1,5 @@
 import { serviceImages } from "@/lib/images";
+import { getSiteContent, type BlogPostContent } from "@/lib/site-content";
 
 export type BlogCategory = "travaux-realises" | "bon-a-savoir" | "actualites";
 
@@ -20,17 +21,31 @@ export const BLOG_CATEGORIES: Record<BlogCategory, string> = {
   actualites: "Actualités Qadus",
 };
 
-export const BLOG_POSTS: BlogPost[] = [
+function toBlogPost(post: BlogPostContent): BlogPost {
+  return {
+    slug: post.slug,
+    title: post.title,
+    excerpt: post.excerpt,
+    category: post.category,
+    categoryLabel: BLOG_CATEGORIES[post.category],
+    date: post.date,
+    location: post.location,
+    image: { src: post.image, alt: post.imageAlt },
+    content: post.content,
+  };
+}
+
+export const FALLBACK_BLOG_POSTS: BlogPostContent[] = [
   {
     slug: "chemisage-residence-saint-germain-en-laye",
     title: "Chemisage d'un réseau d'assainissement en résidence à Saint-Germain-en-Laye",
     excerpt:
       "Réhabilitation de colonnes EU sans tranchée dans une copropriété des Yvelines. Intervention rapide avec contrôle caméra avant/après.",
     category: "travaux-realises",
-    categoryLabel: "Travaux réalisés",
     date: "2026-03-28",
     location: "Saint-Germain-en-Laye (78)",
-    image: serviceImages.chemisageAfter,
+    image: serviceImages.chemisageAfter.src,
+    imageAlt: serviceImages.chemisageAfter.alt,
     content: [
       "Une résidence de Saint-Germain-en-Laye présentait des fuites récurrentes sur le réseau d'eaux usées, avec remontées d'odeurs dans plusieurs logements du R+4.",
       "Après inspection caméra, nous avons identifié des fissures et un affaissement de canalisation en fonte. La solution retenue : chemisage CIPP sur 24 mètres, sans ouverture de dalles communes.",
@@ -43,10 +58,10 @@ export const BLOG_POSTS: BlogPost[] = [
     excerpt:
       "Diagnostic complet par caméra endoscopique pour localiser bouchons, racines et sections affaissées avant curage ciblé.",
     category: "travaux-realises",
-    categoryLabel: "Travaux réalisés",
     date: "2026-03-15",
     location: "Nanterre (92)",
-    image: serviceImages.inspectionCamera,
+    image: serviceImages.inspectionCamera.src,
+    imageAlt: serviceImages.inspectionCamera.alt,
     content: [
       "Le syndic a mandaté Qadus pour comprendre les refoulements répétés aux étages inférieurs. Nous avons inspecté 6 colonnes principales avec caméra HD orientable.",
       "Le rapport a mis en évidence des dépôts graisseux, un tronçon obstrué par des racines et une jonction défectueuse au sous-sol.",
@@ -59,9 +74,9 @@ export const BLOG_POSTS: BlogPost[] = [
     excerpt:
       "Fuites, corrosion, mauvaises odeurs : le chemisage permet de réhabiliter les réseaux vétustes sans casser les sols et murs.",
     category: "bon-a-savoir",
-    categoryLabel: "Bon à savoir",
     date: "2026-03-08",
-    image: serviceImages.chemisageBefore,
+    image: serviceImages.chemisageBefore.src,
+    imageAlt: serviceImages.chemisageBefore.alt,
     content: [
       "Dans les bâtiments anciens d'Île-de-France, les canalisations en fonte ou fibrociment se dégradent avec le temps.",
       "La méthode traditionnelle implique de lourds travaux de tranchée. Le chemisage forme une nouvelle conduite étanche à l'intérieur de l'ancienne.",
@@ -74,9 +89,9 @@ export const BLOG_POSTS: BlogPost[] = [
     excerpt:
       "Découvrez les étapes du chemisage et du cure-in-place pour réparer un réseau endommagé sans démolition.",
     category: "bon-a-savoir",
-    categoryLabel: "Bon à savoir",
     date: "2026-02-22",
-    image: serviceImages.chemisage,
+    image: serviceImages.chemisage.src,
+    imageAlt: serviceImages.chemisage.alt,
     content: [
       "La réhabilitation sans tranchée consiste à insérer une manchon en résine dans la canalisation existante, puis à la durcir sur place.",
       "Après un curage préparatoire et une inspection caméra, la chemise épouse la forme du conduit et comble fissures et micro-fuites.",
@@ -89,10 +104,10 @@ export const BLOG_POSTS: BlogPost[] = [
     excerpt:
       "Nettoyage complet par hydrocureur d'une colonne graisseuse et des collecteurs horizontaux d'un immeuble de 42 logements.",
     category: "travaux-realises",
-    categoryLabel: "Travaux réalisés",
     date: "2026-02-10",
     location: "Poissy (78)",
-    image: serviceImages.curage,
+    image: serviceImages.curage.src,
+    imageAlt: serviceImages.curage.alt,
     content: [
       "Des écoulements lents et des odeurs persistantes indiquaient un réseau encrassé. Nous avons réalisé un curage haute pression jusqu'à 300 bars.",
       "Les dépôts graisseux et calcaires ont été évacués en une journée, avec protection des zones de passage et nettoyage du chantier.",
@@ -105,9 +120,9 @@ export const BLOG_POSTS: BlogPost[] = [
     excerpt:
       "Moins de nuisances, délais courts, coût maîtrisé : le chemisage est idéal pour les copropriétés en Île-de-France.",
     category: "bon-a-savoir",
-    categoryLabel: "Bon à savoir",
     date: "2026-01-28",
-    image: serviceImages.chemisageAfter,
+    image: serviceImages.chemisageAfter.src,
+    imageAlt: serviceImages.chemisageAfter.alt,
     content: [
       "Les syndics doivent concilier urgence, budget et continuité de service. Le chemisage évite les gros travaux structurels.",
       "Les parties communes restent accessibles, les logements sont peu impactés et le syndic dispose d'un rapport technique clair.",
@@ -120,10 +135,10 @@ export const BLOG_POSTS: BlogPost[] = [
     excerpt:
       "Intervention en moins de 2 h pour un WC refoulé et une douche hors service dans un appartement des Yvelines.",
     category: "travaux-realises",
-    categoryLabel: "Travaux réalisés",
     date: "2026-01-15",
     location: "Conflans-Sainte-Honorine (78)",
-    image: serviceImages.urgence,
+    image: serviceImages.urgence.src,
+    imageAlt: serviceImages.urgence.alt,
     content: [
       "Un refoulement complet du WC a nécessité une intervention d'urgence un dimanche soir. Notre équipe est arrivée sur site en moins de 2 heures.",
       "Le bouchon était situé dans la colonne de chute. Débouchage mécanique puis test d'écoulement sur l'ensemble des appartements concernés.",
@@ -136,10 +151,10 @@ export const BLOG_POSTS: BlogPost[] = [
     excerpt:
       "Inspection, curage et réparation localisée sur un réseau EU/EV défaillant dans les Yvelines.",
     category: "travaux-realises",
-    categoryLabel: "Travaux réalisés",
     date: "2025-12-20",
     location: "Les Mureaux (78)",
-    image: serviceImages.assainissement,
+    image: serviceImages.assainissement.src,
+    imageAlt: serviceImages.assainissement.alt,
     content: [
       "Le réseau présentait des infiltrations et des refoulements ponctuels au sous-sol. Nous avons commencé par un diagnostic caméra complet.",
       "Le curage préventif a été complété par une réparation localisée sur une section endommagée, sans remplacement total de la canalisation.",
@@ -152,9 +167,9 @@ export const BLOG_POSTS: BlogPost[] = [
     excerpt:
       "Sans tranchée, rapide, durable : les points clés de la réhabilitation CIPP pour particuliers et professionnels.",
     category: "bon-a-savoir",
-    categoryLabel: "Bon à savoir",
     date: "2025-12-05",
-    image: serviceImages.chemisage,
+    image: serviceImages.chemisage.src,
+    imageAlt: serviceImages.chemisage.alt,
     content: [
       "1. Pas de tranchée. 2. Délais réduits. 3. Moins de nuisances. 4. Coût maîtrisé. 5. Durée de vie prolongée.",
       "6. Étanchéité retrouvée. 7. Contrôle caméra avant/après. 8. Adapté aux réseaux EU/EV/EP. 9. Solution compatible bâtiments anciens.",
@@ -167,9 +182,9 @@ export const BLOG_POSTS: BlogPost[] = [
     excerpt:
       "Éviter les mauvaises surprises, cibler la bonne méthode et maîtriser le budget : le diagnostic vidéo est indispensable.",
     category: "bon-a-savoir",
-    categoryLabel: "Bon à savoir",
     date: "2025-11-18",
-    image: serviceImages.inspectionCamera,
+    image: serviceImages.inspectionCamera.src,
+    imageAlt: serviceImages.inspectionCamera.alt,
     content: [
       "Intervenir sans diagnostic, c'est risquer de traiter le mauvais tronçon ou de choisir une méthode inadaptée.",
       "La caméra endoscopique permet de localiser précisément bouchons, fissures, racines, affaissements et jonctions défectueuses.",
@@ -182,10 +197,10 @@ export const BLOG_POSTS: BlogPost[] = [
     excerpt:
       "Retrouvez nos conseils, réalisations et actualités sur le débouchage, curage, chemisage et assainissement en Île-de-France.",
     category: "actualites",
-    categoryLabel: "Actualités Qadus",
     date: "2026-04-01",
     location: "Île-de-France",
-    image: serviceImages.debouchage,
+    image: serviceImages.debouchage.src,
+    imageAlt: serviceImages.debouchage.alt,
     content: [
       "Qadus renforce sa présence en ligne pour mieux informer particuliers, syndics et professionnels.",
       "Sur ce blog, nous partageons des retours de chantiers, des conseils pratiques et des actualités sur nos prestations en Île-de-France.",
@@ -198,9 +213,9 @@ export const BLOG_POSTS: BlogPost[] = [
     excerpt:
       "Les facteurs qui influencent le tarif : type de bouchon, accessibilité, horaire d'intervention et méthode utilisée.",
     category: "bon-a-savoir",
-    categoryLabel: "Bon à savoir",
     date: "2026-02-01",
-    image: serviceImages.debouchage,
+    image: serviceImages.debouchage.src,
+    imageAlt: serviceImages.debouchage.alt,
     content: [
       "Le prix d'un débouchage dépend du type d'équipement (évier, WC, colonne), de la complexité du bouchon et de l'horaire.",
       "Un diagnostic téléphonique permet d'estimer la fourchette avant déplacement. Chez Qadus, le devis est gratuit et sans engagement.",
@@ -209,14 +224,21 @@ export const BLOG_POSTS: BlogPost[] = [
   },
 ];
 
+function getBlogSource(): BlogPostContent[] {
+  const { blog } = getSiteContent();
+  return blog.length ? blog : FALLBACK_BLOG_POSTS;
+}
+
+export const BLOG_POSTS = FALLBACK_BLOG_POSTS.map(toBlogPost);
+
 export const POSTS_PER_PAGE = 6;
 
 export function getAllPosts() {
-  return [...BLOG_POSTS].sort((a, b) => b.date.localeCompare(a.date));
+  return getBlogSource().map(toBlogPost).sort((a, b) => b.date.localeCompare(a.date));
 }
 
 export function getPostBySlug(slug: string) {
-  return BLOG_POSTS.find((p) => p.slug === slug);
+  return getAllPosts().find((p) => p.slug === slug);
 }
 
 export function getPostsByCategory(category: BlogCategory) {

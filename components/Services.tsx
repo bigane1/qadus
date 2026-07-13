@@ -1,167 +1,78 @@
 import Link from "next/link";
-import { serviceImages } from "@/lib/images";
+import { getSiteContent } from "@/lib/site-content";
+import { getContentImages } from "@/lib/content-images";
 import ChemisageBeforeAfter from "@/components/ChemisageBeforeAfter";
 
-const services = [
-  {
-    title: "Débouchage & Dégorgement",
-    desc: "WC, évier, douche, colonne. Résultat garanti ou remboursé. Intervention en moins de 2h.",
-    tag: "Garanti",
-    icon: "🚽",
-    href: "/debouchage",
-    accent: "bg-blue-100 text-blue-700 border-blue-200",
-    iconBg: "bg-blue-50",
-    image: serviceImages.debouchage.src,
-    imageAlt: serviceImages.debouchage.alt,
-  },
-  {
-    title: "Curage Haute Pression",
-    desc: "Nettoyage complet du réseau par hydrocurage jusqu'à 350 bars. Camion hydrocureur disponible.",
-    tag: "Préventif",
-    icon: "💦",
-    href: "/curage",
-    accent: "bg-teal-100 text-teal-700 border-teal-200",
-    iconBg: "bg-teal-50",
-    image: serviceImages.curage.src,
-    imageAlt: serviceImages.curage.alt,
-  },
-  {
-    title: "Inspection Caméra",
-    desc: "Caméra endoscopique HD + robot d'inspection. Rapport vidéo complet agréé assurances.",
-    tag: "Diagnostic",
-    icon: "📷",
-    href: "/inspection-camera",
-    accent: "bg-indigo-100 text-indigo-700 border-indigo-200",
-    iconBg: "bg-indigo-50",
-    image: serviceImages.inspectionCamera.src,
-    imageAlt: serviceImages.inspectionCamera.alt,
-  },
-  {
-    title: "Chemisage Sans Tranchée",
-    desc: "Réhabilitation CIPP sans démolition. Économie jusqu'à 70% vs remplacement classique. Garanti 10 ans.",
-    tag: "Sans tranchée",
-    icon: "🔧",
-    href: "/chemisage",
-    accent: "bg-orange-100 text-orange-700 border-orange-200",
-    iconBg: "bg-orange-50",
-    image: serviceImages.chemisageAfter.src,
-    imageAlt: serviceImages.chemisageAfter.alt,
-    beforeAfter: true,
-  },
-  {
-    title: "Assainissement & Réseaux",
-    desc: "Bacs à graisse, postes de relevage, réseaux EU/EV/EP. Particuliers, restaurants, collectivités.",
-    tag: "Réseaux",
-    icon: "♻️",
-    href: "/assainissement",
-    accent: "bg-emerald-100 text-emerald-700 border-emerald-200",
-    iconBg: "bg-emerald-50",
-    image: serviceImages.assainissement.src,
-    imageAlt: serviceImages.assainissement.alt,
-  },
-  {
-    title: "Urgence 24h/24",
-    desc: "Nuit, week-end, jours fériés. Appel gratuit, déplacement gratuit. Tarif annoncé avant intervention.",
-    tag: "Toujours dispo",
-    icon: "⚡",
-    href: "/#contact",
-    accent: "bg-red-100 text-red-700 border-red-200",
-    iconBg: "bg-red-50",
-    image: serviceImages.urgence.src,
-    imageAlt: serviceImages.urgence.alt,
-  },
-  {
-    title: "Fuite & Dégât des eaux",
-    desc: "Détection et réparation de fuites, robinets, joints, tuyaux encastrés. Agréé assurances.",
-    tag: "Urgence",
-    icon: "💧",
-    href: "/#contact",
-    accent: "bg-sky-100 text-sky-700 border-sky-200",
-    iconBg: "bg-sky-50",
-    image: serviceImages.fuite.src,
-    imageAlt: serviceImages.fuite.alt,
-  },
-  {
-    title: "Salle de bain & Sanitaire",
-    desc: "Installation et rénovation complète : douche, baignoire, WC, lavabo. Travail soigné et garanti.",
-    tag: "Rénovation",
-    icon: "🚿",
-    href: "/#contact",
-    accent: "bg-violet-100 text-violet-700 border-violet-200",
-    iconBg: "bg-violet-50",
-    image: serviceImages.salleDeBain.src,
-    imageAlt: serviceImages.salleDeBain.alt,
-  },
+const accentMap = [
+  "bg-blue-100 text-blue-700 border-blue-200",
+  "bg-teal-100 text-teal-700 border-teal-200",
+  "bg-indigo-100 text-indigo-700 border-indigo-200",
+  "bg-orange-100 text-orange-700 border-orange-200",
+  "bg-emerald-100 text-emerald-700 border-emerald-200",
+  "bg-red-100 text-red-700 border-red-200",
+  "bg-sky-100 text-sky-700 border-sky-200",
+  "bg-violet-100 text-violet-700 border-violet-200",
+];
+
+const iconBgMap = [
+  "bg-blue-50",
+  "bg-teal-50",
+  "bg-indigo-50",
+  "bg-orange-50",
+  "bg-emerald-50",
+  "bg-red-50",
+  "bg-sky-50",
+  "bg-violet-50",
 ];
 
 export default function Services() {
+  const content = getSiteContent();
+  const images = getContentImages();
+  const services = content.services;
+  const section = content.servicesSection;
+
   return (
     <section id="services" className="py-20 px-4 bg-slate-50">
       <div className="max-w-7xl mx-auto">
         <div className="text-center mb-16">
           <span className="inline-block bg-blue-100 text-blue-700 text-xs font-bold uppercase tracking-widest px-4 py-1.5 rounded-full mb-4">
-            Nos prestations
+            {section.badge}
           </span>
-          <h2 className="text-4xl sm:text-5xl font-black text-slate-900 mb-4">
-            Tous vos besoins,<br />une seule équipe
+          <h2 className="text-4xl sm:text-5xl font-black text-slate-900 mb-4 whitespace-pre-line">
+            {section.title}
           </h2>
           <p className="text-lg text-slate-500 max-w-2xl mx-auto">
-            Du dépannage d&apos;urgence au chemisage sans tranchée — interventions
-            pour particuliers, syndics, collectivités et industries en Île-de-France.
+            {section.subtitle}
           </p>
         </div>
 
         <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-5">
-          {services.map((s) => (
+          {services.map((s, i) => (
             <Link
-              key={s.title}
+              key={s.title + i}
               href={s.href}
               className="group flex flex-col bg-white rounded-2xl p-4 border border-slate-200 hover:border-blue-200 hover:shadow-lg hover:-translate-y-1 transition-all duration-200"
             >
-              {/* Photo — avant/après pour le chemisage */}
-              {"beforeAfter" in s && s.beforeAfter ? (
+              {s.beforeAfter ? (
                 <div className="grid grid-cols-2 gap-1 mb-4 rounded-xl overflow-hidden h-36">
                   <div className="relative">
-                    <img
-                      src={serviceImages.chemisageBefore.src}
-                      alt={serviceImages.chemisageBefore.alt}
-                      className="w-full h-full object-cover"
-                      loading="lazy"
-                    />
-                    <span className="absolute bottom-1 left-1 bg-red-600 text-white text-[9px] font-bold px-1.5 py-0.5 rounded">
-                      Avant
-                    </span>
+                    <img src={images.chemisageBefore.src} alt={images.chemisageBefore.alt} className="w-full h-full object-cover" loading="lazy" />
+                    <span className="absolute bottom-1 left-1 bg-red-600 text-white text-[9px] font-bold px-1.5 py-0.5 rounded">Avant</span>
                   </div>
                   <div className="relative">
-                    <img
-                      src={serviceImages.chemisageAfter.src}
-                      alt={serviceImages.chemisageAfter.alt}
-                      className="w-full h-full object-cover"
-                      loading="lazy"
-                    />
-                    <span className="absolute bottom-1 left-1 bg-green-600 text-white text-[9px] font-bold px-1.5 py-0.5 rounded">
-                      Après
-                    </span>
+                    <img src={images.chemisageAfter.src} alt={images.chemisageAfter.alt} className="w-full h-full object-cover" loading="lazy" />
+                    <span className="absolute bottom-1 left-1 bg-green-600 text-white text-[9px] font-bold px-1.5 py-0.5 rounded">Après</span>
                   </div>
                 </div>
               ) : (
-                <img
-                  src={s.image}
-                  alt={s.imageAlt}
-                  className="w-full h-36 object-cover rounded-xl mb-4"
-                  loading="lazy"
-                />
+                <img src={s.image} alt={s.imageAlt} className="w-full h-36 object-cover rounded-xl mb-4" loading="lazy" />
               )}
 
               <div className="flex items-start justify-between gap-3 mb-3 px-1">
-                <div
-                  className={`w-11 h-11 rounded-xl flex items-center justify-center text-xl flex-shrink-0 ${s.iconBg}`}
-                >
+                <div className={`w-11 h-11 rounded-xl flex items-center justify-center text-xl flex-shrink-0 ${iconBgMap[i % iconBgMap.length]}`}>
                   {s.icon}
                 </div>
-                <span
-                  className={`text-[10px] font-bold uppercase tracking-wide px-2 py-1 rounded-full border ${s.accent}`}
-                >
+                <span className={`text-[10px] font-bold uppercase tracking-wide px-2 py-1 rounded-full border ${accentMap[i % accentMap.length]}`}>
                   {s.tag}
                 </span>
               </div>

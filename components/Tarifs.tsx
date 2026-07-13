@@ -44,6 +44,7 @@ const fallbackTarifs = [
 
 export default function Tarifs() {
   const content = getSiteContent();
+  const section = content.tarifsSection;
   const tarifs = content.tarifs.length
     ? content.tarifs.map((item) => ({
         ...item,
@@ -56,13 +57,13 @@ export default function Tarifs() {
       <div className="max-w-7xl mx-auto">
         <div className="text-center mb-14">
           <span className="inline-block bg-amber-100 text-amber-700 text-xs font-bold uppercase tracking-widest px-4 py-1.5 rounded-full mb-4">
-            Tarifs des prestations
+            {section.badge}
           </span>
           <h2 className="text-4xl sm:text-5xl font-black text-slate-900 mb-4">
-            Prestations et prix indicatifs
+            {section.title}
           </h2>
           <p className="text-lg text-slate-500 max-w-2xl mx-auto">
-            Les tarifs ci-dessous sont des bases indicatives. Le prix exact est confirmé après diagnostic.
+            {section.subtitle}
           </p>
         </div>
 

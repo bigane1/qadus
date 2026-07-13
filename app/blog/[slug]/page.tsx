@@ -6,16 +6,17 @@ import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import { TEL_DISPLAY, telHref } from "@/lib/contact";
 import {
-  BLOG_POSTS,
   formatBlogDate,
   getAllPosts,
   getPostBySlug,
 } from "@/lib/blog";
 
+export const dynamic = "force-dynamic";
+
 type Props = { params: Promise<{ slug: string }> };
 
 export async function generateStaticParams() {
-  return BLOG_POSTS.map((p) => ({ slug: p.slug }));
+  return getAllPosts().map((p) => ({ slug: p.slug }));
 }
 
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
