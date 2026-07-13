@@ -65,7 +65,22 @@ patch_proxy_in_file() {
 
 patch_aapanel_qadus_vhosts() {
   local _dir _f _found=0
+  local _main_conf="/www/server/panel/vhost/nginx/qadus.fr.conf"
+
   echo "=== Patch vhosts aaPanel (qadus.fr → ${QADUS_PORT}) ==="
+
+  if run_sudo test -f "$_main_conf" 2>/dev/null; then
+    echo "→ patch explicite $_main_conf"
+    run_sudo sed -i 's|proxy_pass http://qadus_next|proxy_pass http://127.0.0.1:3002|g' "$_main_conf"
+    run_sudo sed -i -E \
+      "s#proxy_pass[[:space:]]+https?://(127\\.0\\.0\\.1|localhost):[0-9]+/?#proxy_pass ${PROXY_TARGET}#g" \
+      "$_main_conf"
+    run_sudo sed -i -E \
+      "s#server[[:space:]]+(127\\.0\\.0\\.1|localhost):[0-9]+;#server 127.0.0.1:${QADUS_PORT};#g" \
+      "$_main_conf"
+    _found=1
+  fi
+
   for _dir in \
     /www/server/panel/vhost/nginx \
     /www/server/panel/vhost/nginx/extension/qadus.fr \
@@ -217,14 +232,32 @@ curl_check() {
 }
 
 verify_public_proxy() {
-  local _attempt
+  local _attempt _direct_ok=false
+
+  echo "=== Vérification app sur :${QADUS_PORT} ==="
+  if curl_check "direct :${QADUS_PORT}" "http://127.0.0.1:${QADUS_PORT}/"; then
+    _direct_ok=true
+  else
+    echo "::error::L'application ne sert pas la nouvelle version sur :${QADUS_PORT}"
+    return 1
+  fi
+
   for _attempt in 1 2 3 4 5; do
     sleep 2
-    echo "=== Vérification (tentative $_attempt) ==="
-    curl_check "direct :${QADUS_PORT}" "http://127.0.0.1:${QADUS_PORT}/" && return 0
-    curl_check "nginx HTTP" -H "Host: www.qadus.fr" "http://127.0.0.1/" && return 0
-    curl_check "nginx HTTPS" --resolve "www.qadus.fr:443:127.0.0.1" "https://www.qadus.fr/" && return 0
+    echo "=== Vérification nginx public (tentative $_attempt) ==="
+    if curl_check "nginx HTTPS" --resolve "www.qadus.fr:443:127.0.0.1" "https://www.qadus.fr/"; then
+      return 0
+    fi
+    if curl_check "nginx HTTP" -H "Host: www.qadus.fr" "http://127.0.0.1/"; then
+      return 0
+    fi
   done
+
+  if [ "$_direct_ok" = true ]; then
+    echo "::error::App OK sur :${QADUS_PORT} mais nginx ne sert pas la nouvelle version au public"
+    echo "Sur aaPanel : sudo sed -i 's|proxy_pass http://qadus_next|proxy_pass http://127.0.0.1:3002|g' /www/server/panel/vhost/nginx/qadus.fr.conf"
+    echo "Puis : sudo /www/server/nginx/sbin/nginx -s reload -c /www/server/nginx/conf/nginx.conf"
+  fi
   return 1
 }
 

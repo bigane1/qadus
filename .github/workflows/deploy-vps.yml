@@ -113,7 +113,7 @@ jobs:
         run: |
           echo "=== Vérification du numéro 06 67 25 08 85 sur https://www.qadus.fr/ ==="
           for attempt in 1 2 3 4 5 6; do
-            body=$(curl -sL --max-time 20 https://www.qadus.fr/ || true)
+            body=$(curl -sL --max-time 20 -H "Cache-Control: no-cache" "https://www.qadus.fr/?v=$(date +%s)" || true)
             if echo "$body" | grep -qE "06 67 25 08 85|0667250885"; then
               echo "=== OK : nouvelle version déployée (tentative $attempt) ==="
               exit 0
