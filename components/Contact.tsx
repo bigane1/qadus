@@ -100,8 +100,8 @@ export default function Contact() {
                 icon: "📍",
                 label: "Adresse",
                 value: ADDRESS_DISPLAY,
-                href: "https://maps.google.com/?q=54+rue+Sainte-Honorine+78955+Carrieres-sous-Poissy",
-                sub: "78955 Carrières-sous-Poissy",
+                href: "https://maps.google.com/?q=Carrieres-sous-Poissy+78955",
+                sub: "Yvelines (78)",
               },
               {
                 icon: "📘",

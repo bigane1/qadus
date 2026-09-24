@@ -128,7 +128,7 @@ export const defaultSiteContent: SiteContent = {
   phone: "0667250885",
   phoneDisplay: "06 67 25 08 85",
   facebookUrl: "https://www.facebook.com/share/1LAY4LR2By/?mibextid=wwXIfr",
-  address: "54 rue Sainte-Honorine, 78955 Carrières-sous-Poissy",
+  address: "Carrières-sous-Poissy 78955",
   heroTitle: "Débouchage & Assainissement en Île-de-France",
   heroSubtitle: "Intervention rapide 24h/24 — devis gratuit",
   tarifs: [
@@ -290,7 +290,7 @@ export const defaultSiteContent: SiteContent = {
       "Professionnels du bâtiment",
     ],
     locationTitle: "Où nous trouver ?",
-    locationText: "54 rue Sainte-Honorine, 78955 Carrières-sous-Poissy",
+    locationText: "Carrières-sous-Poissy 78955",
     zoneText:
       "Zone d'intervention : Yvelines (78), Hauts-de-Seine (92), Val-d'Oise (95), Paris et toute l'Île-de-France.",
     missionImage: heroImage.src,

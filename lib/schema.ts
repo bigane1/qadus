@@ -15,7 +15,6 @@ export const localBusinessSchema = {
   taxID: "990 840 019",
   address: {
     "@type": "PostalAddress",
-    streetAddress: "54 rue Sainte-Honorine",
     addressLocality: "Carrières-sous-Poissy",
     postalCode: "78955",
     addressRegion: "Yvelines",
