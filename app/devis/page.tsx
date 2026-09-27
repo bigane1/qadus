@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 import Link from "next/link";
-import Header from "@/components/Header";
+import SiteHeader from "@/components/SiteHeader";
 import Footer from "@/components/Footer";
 import FloatingCTA from "@/components/FloatingCTA";
 import Contact from "@/components/Contact";
@@ -16,7 +16,7 @@ export const metadata: Metadata = {
 export default function DevisPage() {
   return (
     <>
-      <Header />
+      <SiteHeader />
       <main className="pt-16">
         <section className="bg-gradient-to-br from-blue-900 via-blue-800 to-slate-900 text-white py-14 px-4">
           <div className="max-w-3xl mx-auto text-center">

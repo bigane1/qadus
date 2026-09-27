@@ -1,5 +1,5 @@
 import Link from "next/link";
-import Header from "./Header";
+import SiteHeader from "./SiteHeader";
 import Footer from "./Footer";
 import FloatingCTA from "./FloatingCTA";
 import ChemisageBeforeAfter from "./ChemisageBeforeAfter";
@@ -43,7 +43,7 @@ export default function ServicePageLayout({
 }: ServicePageLayoutProps) {
   return (
     <>
-      <Header />
+      <SiteHeader />
       <main className="pt-16">
         {/* Hero */}
         <section className="bg-gradient-to-br from-blue-900 via-blue-800 to-slate-900 text-white py-20 px-4">

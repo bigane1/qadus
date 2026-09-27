@@ -6,6 +6,6 @@ export function getContentImages() {
     hero: { src: images.hero, alt: images.heroAlt },
     chemisageBefore: { src: images.chemisageBefore, alt: images.chemisageBeforeAlt },
     chemisageAfter: { src: images.chemisageAfter, alt: images.chemisageAfterAlt },
-    logo: images.logo,
+    logo: images.logo || "/logo-round.png",
   };
 }

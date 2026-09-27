@@ -1,5 +1,5 @@
 import { faqSchema } from "@/lib/schema";
-import Header from "@/components/Header";
+import SiteHeader from "@/components/SiteHeader";
 import Hero from "@/components/Hero";
 import UrgenceBand from "@/components/UrgenceBand";
 import Stats from "@/components/Stats";
@@ -27,7 +27,7 @@ export default function Home() {
         dangerouslySetInnerHTML={{ __html: JSON.stringify(faqSchema) }}
       />
 
-      <Header />
+      <SiteHeader />
       <main>
         <Hero />
         <UrgenceBand />

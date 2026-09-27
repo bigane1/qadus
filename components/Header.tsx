@@ -6,7 +6,7 @@ import Image from "next/image";
 import { TEL_DISPLAY, telHref, whatsappHref } from "@/lib/contact";
 import { navLinks, navServices } from "@/lib/navigation";
 
-export default function Header() {
+export default function Header({ logoSrc = "/logo-round.png" }: { logoSrc?: string }) {
   const [scrolled, setScrolled] = useState(false);
   const [menuOpen, setMenuOpen] = useState(false);
   const [servicesOpen, setServicesOpen] = useState(false);
@@ -33,8 +33,18 @@ export default function Header() {
     >
       <div className="max-w-7xl mx-auto px-4 sm:px-6">
         <div className="flex items-center justify-between h-16 lg:h-18">
-          <Link href="/" className="flex items-center gap-2 flex-shrink-0">
-            <Image src="/logo.png" alt="Qadus" width={130} height={44} style={{ width: "auto", height: "44px" }} priority />
+          <Link href="/" className="flex items-center gap-2.5 flex-shrink-0">
+            <span className="relative h-11 w-11 overflow-hidden rounded-full bg-transparent ring-1 ring-slate-200/60">
+              <Image
+                src={logoSrc}
+                alt="Qadus"
+                fill
+                className="object-cover"
+                sizes="44px"
+                priority
+              />
+            </span>
+            <span className="font-black text-slate-800 text-lg tracking-tight">Qadus</span>
           </Link>
 
           {/* Nav desktop */}

@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 import Link from "next/link";
-import Header from "@/components/Header";
+import SiteHeader from "@/components/SiteHeader";
 import Footer from "@/components/Footer";
 import FloatingCTA from "@/components/FloatingCTA";
 import { TEL_DISPLAY, telHref } from "@/lib/contact";
@@ -19,7 +19,7 @@ export default function QuiSommesNousPage() {
 
   return (
     <>
-      <Header />
+      <SiteHeader />
       <main className="pt-16">
         <section className="bg-gradient-to-br from-blue-900 via-blue-800 to-slate-900 text-white py-20 px-4">
           <div className="max-w-4xl mx-auto text-center">

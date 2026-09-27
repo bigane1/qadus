@@ -103,6 +103,10 @@ export type SiteImages = {
   chemisageAfter: string;
   chemisageAfterAlt: string;
   logo: string;
+  footerImage1: string;
+  footerImage1Alt: string;
+  footerImage2: string;
+  footerImage2Alt: string;
 };
 
 export type SiteContent = {
@@ -305,7 +309,11 @@ export const defaultSiteContent: SiteContent = {
     chemisageBeforeAlt: serviceImages.chemisageBefore.alt,
     chemisageAfter: serviceImages.chemisageAfter.src,
     chemisageAfterAlt: serviceImages.chemisageAfter.alt,
-    logo: "/logo.png",
+    logo: "/logo-round.png",
+    footerImage1: "",
+    footerImage1Alt: "",
+    footerImage2: "",
+    footerImage2Alt: "",
   },
   servicesSection: {
     badge: "Nos prestations",

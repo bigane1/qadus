@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import BlogSidebar from "@/components/BlogSidebar";
-import Header from "@/components/Header";
+import SiteHeader from "@/components/SiteHeader";
 import Footer from "@/components/Footer";
 import { TEL_DISPLAY, telHref } from "@/lib/contact";
 import {
@@ -51,7 +51,7 @@ export default async function BlogArticlePage({ params }: Props) {
 
   return (
     <>
-      <Header />
+      <SiteHeader />
       <main className="min-h-screen bg-slate-50">
         <div className="relative h-72 md:h-96 overflow-hidden">
           <img

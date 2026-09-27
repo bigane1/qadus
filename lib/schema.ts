@@ -5,7 +5,7 @@ export const localBusinessSchema = {
   "@type": "Plumber",
   name: "Qadus",
   url: "https://www.qadus.fr",
-  logo: "https://www.qadus.fr/logo.png",
+  logo: "https://www.qadus.fr/logo-round.png",
   image: "https://www.qadus.fr/og-image.jpg",
   description:
     "Qadus — Spécialiste débouchage, assainissement et réhabilitation de canalisations en Île-de-France. Chemisage sans tranchée, inspection caméra, curage, hydrocurage, bacs à graisse, postes de relevage. Intervention 24h/24 7j/7.",

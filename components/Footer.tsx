@@ -1,6 +1,8 @@
 import Link from "next/link";
 import Image from "next/image";
 import { FACEBOOK_URL, EMAIL, TEL_DISPLAY, mailtoHref, telHref } from "@/lib/contact";
+import { getContentImages } from "@/lib/content-images";
+import { getSiteContent } from "@/lib/site-content";
 
 const currentYear = new Date().getFullYear();
 
@@ -27,19 +29,28 @@ const zones = [
 ];
 
 export default function Footer() {
+  const { logo } = getContentImages();
+  const { address, images } = getSiteContent();
+  const logoSrc = logo || "/logo-round.png";
+  const footerImage1 = images.footerImage1 || "";
+  const footerImage2 = images.footerImage2 || "";
+
   return (
     <footer className="bg-slate-900 text-slate-400">
       <div className="max-w-7xl mx-auto px-4 py-16 grid sm:grid-cols-2 lg:grid-cols-4 gap-10">
         {/* Brand */}
         <div>
-          <Link href="/" className="inline-block mb-4">
-            <Image
-              src="/logo.png"
-              alt="Qadus"
-              width={140}
-              height={48}
-              style={{ width: "auto", height: "48px" }}
-            />
+          <Link href="/" className="inline-flex items-center gap-3 mb-4">
+            <span className="relative h-12 w-12 overflow-hidden rounded-full bg-transparent ring-1 ring-white/15">
+              <Image
+                src={logoSrc}
+                alt="Qadus"
+                fill
+                className="object-cover"
+                sizes="48px"
+              />
+            </span>
+            <span className="font-black text-white text-xl tracking-tight">Qadus</span>
           </Link>
           <p className="text-sm leading-relaxed mb-5">
             Plombier, spécialiste débouchage et assainissement à Poissy et dans
@@ -67,9 +78,23 @@ export default function Footer() {
               📘 Facebook QADUS
             </a>
             <span className="flex items-center gap-2 text-sm">
-              📍 Carrières-sous-Poissy (78955)
+              📍 {address}
             </span>
           </div>
+          {(footerImage1 || footerImage2) && (
+            <div className="mt-5 flex gap-3">
+              {footerImage1 ? (
+                <div className="relative h-16 w-16 overflow-hidden rounded-xl ring-1 ring-white/10">
+                  <Image src={footerImage1} alt={images.footerImage1Alt || "Qadus"} fill className="object-cover" sizes="64px" />
+                </div>
+              ) : null}
+              {footerImage2 ? (
+                <div className="relative h-16 w-16 overflow-hidden rounded-xl ring-1 ring-white/10">
+                  <Image src={footerImage2} alt={images.footerImage2Alt || "Qadus"} fill className="object-cover" sizes="64px" />
+                </div>
+              ) : null}
+            </div>
+          )}
         </div>
 
         {/* Services */}
