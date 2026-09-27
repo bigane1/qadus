@@ -33,18 +33,18 @@ export default function Header({ logoSrc = "/logo-round.png" }: { logoSrc?: stri
     >
       <div className="max-w-7xl mx-auto px-4 sm:px-6">
         <div className="flex items-center justify-between h-16 lg:h-18">
-          <Link href="/" className="flex items-center gap-2.5 flex-shrink-0">
-            <span className="relative h-11 w-11 overflow-hidden rounded-full bg-transparent ring-1 ring-slate-200/60">
+          <Link href="/" className="flex items-center gap-2.5 flex-shrink-0 min-w-0">
+            <span className="relative h-10 w-10 sm:h-11 sm:w-11 flex-shrink-0 overflow-hidden rounded-full bg-white/80 ring-1 ring-slate-200/70">
               <Image
                 src={logoSrc}
                 alt="Qadus"
                 fill
-                className="object-cover"
+                className="object-contain p-1.5"
                 sizes="44px"
                 priority
               />
             </span>
-            <span className="font-black text-slate-800 text-lg tracking-tight">Qadus</span>
+            <span className="font-black text-slate-800 text-lg tracking-tight truncate">Qadus</span>
           </Link>
 
           {/* Nav desktop */}

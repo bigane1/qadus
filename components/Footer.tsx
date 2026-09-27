@@ -29,9 +29,9 @@ const zones = [
 ];
 
 export default function Footer() {
-  const { logo } = getContentImages();
+  const { logoMark } = getContentImages();
   const { address, images } = getSiteContent();
-  const logoSrc = logo || "/logo-round.png";
+  const logoSrc = logoMark;
   const footerImage1 = images.footerImage1 || "";
   const footerImage2 = images.footerImage2 || "";
 
@@ -41,12 +41,12 @@ export default function Footer() {
         {/* Brand */}
         <div>
           <Link href="/" className="inline-flex items-center gap-3 mb-4">
-            <span className="relative h-12 w-12 overflow-hidden rounded-full bg-transparent ring-1 ring-white/15">
+            <span className="relative h-12 w-12 flex-shrink-0 overflow-hidden rounded-full bg-slate-800 ring-1 ring-white/15">
               <Image
                 src={logoSrc}
                 alt="Qadus"
                 fill
-                className="object-cover"
+                className="object-contain p-1.5"
                 sizes="48px"
               />
             </span>

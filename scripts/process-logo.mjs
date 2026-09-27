@@ -32,10 +32,19 @@ await sharp(transparent).png().toFile("public/logo-transparent.png");
 fs.copyFileSync("public/logo-transparent.png", "public/logo.png");
 
 const iconSize = 512;
+const inner = Math.round(iconSize * 0.88);
+
 const iconSquare = await sharp(transparent)
   .extract({ left: 97, top: 38, width: 451, height: 380 })
-  .resize(iconSize, iconSize, {
+  .resize(inner, inner, {
     fit: "contain",
+    background: { r: 0, g: 0, b: 0, alpha: 0 },
+  })
+  .extend({
+    top: Math.round((iconSize - inner) / 2),
+    bottom: Math.round((iconSize - inner) / 2),
+    left: Math.round((iconSize - inner) / 2),
+    right: Math.round((iconSize - inner) / 2),
     background: { r: 0, g: 0, b: 0, alpha: 0 },
   })
   .png()
@@ -50,12 +59,16 @@ const roundIcon = await sharp(iconSquare)
   .png()
   .toBuffer();
 
-await sharp(roundIcon).resize(32, 32).png().toFile("public/favicon.png");
-await sharp(roundIcon).resize(192, 192).png().toFile("public/icon-192.png");
-await sharp(roundIcon).resize(180, 180).png().toFile("public/apple-icon.png");
-await sharp(roundIcon).resize(32, 32).png().toFile("app/icon.png");
-await sharp(roundIcon).resize(180, 180).png().toFile("app/apple-icon.png");
-await sharp(roundIcon).resize(256, 256).png().toFile("public/logo-round.png");
+async function writeIcon(size, path) {
+  await sharp(roundIcon).resize(size, size).png().toFile(path);
+}
+
+await writeIcon(32, "public/favicon.png");
+await writeIcon(192, "public/icon-192.png");
+await writeIcon(180, "public/apple-icon.png");
+await writeIcon(32, "app/icon.png");
+await writeIcon(180, "app/apple-icon.png");
+await writeIcon(256, "public/logo-round.png");
 
 console.log("logo processed", {
   logo: fs.statSync("public/logo.png").size,
