@@ -29,9 +29,9 @@ const zones = [
 ];
 
 export default function Footer() {
-  const { logoMark } = getContentImages();
+  const { logoFull } = getContentImages();
   const { address, images } = getSiteContent();
-  const logoSrc = logoMark;
+  const logoSrc = logoFull;
   const footerImage1 = images.footerImage1 || "";
   const footerImage2 = images.footerImage2 || "";
 
@@ -40,17 +40,16 @@ export default function Footer() {
       <div className="max-w-7xl mx-auto px-4 py-16 grid sm:grid-cols-2 lg:grid-cols-4 gap-10">
         {/* Brand */}
         <div>
-          <Link href="/" className="inline-flex items-center gap-3 mb-4">
-            <span className="relative h-12 w-12 flex-shrink-0 overflow-hidden rounded-full bg-slate-800 ring-1 ring-white/15">
-              <Image
-                src={logoSrc}
-                alt="Qadus"
-                fill
-                className="object-contain p-1.5"
-                sizes="48px"
-              />
-            </span>
-            <span className="font-black text-white text-xl tracking-tight">Qadus</span>
+          <Link href="/" className="inline-block mb-4">
+            <Image
+              src={logoSrc}
+              alt="Qadus"
+              width={140}
+              height={140}
+              className="h-14 w-auto max-w-[10rem] object-contain object-left bg-transparent opacity-95"
+              sizes="160px"
+              unoptimized
+            />
           </Link>
           <p className="text-sm leading-relaxed mb-5">
             Plombier, spécialiste débouchage et assainissement à Poissy et dans

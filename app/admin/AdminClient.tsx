@@ -1,7 +1,8 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import type { SiteContent, BlogPostContent, PrestationPage } from "@/lib/site-content";
+import type { SiteContent, BlogPostContent, PrestationPage, RealisationItem } from "@/lib/site-content";
+import type { RealisationColor } from "@/lib/realisations-defaults";
 import { ImageField, Field } from "@/components/admin/ImageField";
 import { SaveButton } from "@/components/admin/SaveButton";
 
@@ -11,6 +12,7 @@ const TABS = [
   { id: "services", label: "Prestations accueil" },
   { id: "prestations", label: "Pages prestations" },
   { id: "tarifs", label: "Tarifs" },
+  { id: "realisations", label: "Réalisations" },
   { id: "blog", label: "Blog" },
   { id: "about", label: "Qui sommes-nous" },
 ] as const;
@@ -123,6 +125,12 @@ export default function AdminClient() {
     setContent({ ...content, prestations });
   };
 
+  const updateRealisation = (index: number, patch: Partial<RealisationItem>) => {
+    const realisations = [...content.realisations];
+    realisations[index] = { ...realisations[index], ...patch };
+    setContent({ ...content, realisations });
+  };
+
   const p = content.prestations[prestationIndex];
 
   return (
@@ -170,7 +178,7 @@ export default function AdminClient() {
             <>
             <div className="grid md:grid-cols-2 gap-6">
               <ImageField label="Image hero accueil" value={content.images.hero} onChange={(v) => setContent({ ...content, images: { ...content.images, hero: v } })} altValue={content.images.heroAlt} onAltChange={(v) => setContent({ ...content, images: { ...content.images, heroAlt: v } })} />
-              <ImageField label="Logo rond (symbole seul — header, footer)" value={content.images.logo ?? ""} onChange={(v) => setContent({ ...content, images: { ...content.images, logo: v } })} />
+              <ImageField label="Logo complet (symbole + Qadus — header & footer)" value={content.images.logo ?? ""} onChange={(v) => setContent({ ...content, images: { ...content.images, logo: v } })} />
               <ImageField label="Image footer 1" value={content.images.footerImage1 ?? ""} onChange={(v) => setContent({ ...content, images: { ...content.images, footerImage1: v } })} altValue={content.images.footerImage1Alt ?? ""} onAltChange={(v) => setContent({ ...content, images: { ...content.images, footerImage1Alt: v } })} />
               <ImageField label="Image footer 2" value={content.images.footerImage2 ?? ""} onChange={(v) => setContent({ ...content, images: { ...content.images, footerImage2: v } })} altValue={content.images.footerImage2Alt ?? ""} onAltChange={(v) => setContent({ ...content, images: { ...content.images, footerImage2Alt: v } })} />
               <ImageField label="Chemisage AVANT" value={content.images.chemisageBefore} onChange={(v) => setContent({ ...content, images: { ...content.images, chemisageBefore: v } })} altValue={content.images.chemisageBeforeAlt} onAltChange={(v) => setContent({ ...content, images: { ...content.images, chemisageBeforeAlt: v } })} />
@@ -259,6 +267,150 @@ export default function AdminClient() {
               ))}
               <button type="button" className="text-blue-700 font-semibold" onClick={() => setContent({ ...content, tarifs: [...content.tarifs, { title: "", price: "", desc: "", image: "" }] })}>+ Ajouter un tarif</button>
               <SaveButton label="Enregistrer — Tarifs" onSave={persistContent} />
+            </>
+          )}
+
+          {tab === "realisations" && (
+            <>
+              <div className="grid md:grid-cols-3 gap-4 mb-6">
+                <Field
+                  label="Badge"
+                  value={content.realisationsSection.badge}
+                  onChange={(v) =>
+                    setContent({
+                      ...content,
+                      realisationsSection: { ...content.realisationsSection, badge: v },
+                    })
+                  }
+                />
+                <Field
+                  label="Titre"
+                  value={content.realisationsSection.title}
+                  onChange={(v) =>
+                    setContent({
+                      ...content,
+                      realisationsSection: { ...content.realisationsSection, title: v },
+                    })
+                  }
+                />
+                <Field
+                  label="Sous-titre"
+                  value={content.realisationsSection.subtitle}
+                  onChange={(v) =>
+                    setContent({
+                      ...content,
+                      realisationsSection: { ...content.realisationsSection, subtitle: v },
+                    })
+                  }
+                  textarea
+                />
+              </div>
+              <Field
+                label="Note sous la galerie"
+                value={content.realisationsFooterNote}
+                onChange={(v) => setContent({ ...content, realisationsFooterNote: v })}
+                textarea
+              />
+              {content.realisations.map((item, index) => (
+                <div key={index} className="border rounded-xl p-4 space-y-3 mb-4">
+                  <div className="flex justify-between items-center">
+                    <h3 className="font-bold">{item.type || `Réalisation ${index + 1}`}</h3>
+                    <button
+                      type="button"
+                      className="text-red-600 text-sm"
+                      onClick={() =>
+                        setContent({
+                          ...content,
+                          realisations: content.realisations.filter((_, j) => j !== index),
+                        })
+                      }
+                    >
+                      Supprimer
+                    </button>
+                  </div>
+                  <div className="grid md:grid-cols-2 gap-3">
+                    <Field
+                      label="Type / prestation"
+                      value={item.type}
+                      onChange={(v) => updateRealisation(index, { type: v })}
+                    />
+                    <Field label="Lieu" value={item.lieu} onChange={(v) => updateRealisation(index, { lieu: v })} />
+                    <Field label="Icône" value={item.icon} onChange={(v) => updateRealisation(index, { icon: v })} />
+                    <label className="text-sm font-semibold">
+                      Couleur du badge
+                      <select
+                        className="mt-1 w-full border rounded-xl px-3 py-2 font-normal"
+                        value={item.color}
+                        onChange={(e) =>
+                          updateRealisation(index, { color: e.target.value as RealisationColor })
+                        }
+                      >
+                        {(["blue", "purple", "orange", "green", "teal", "red"] as const).map((c) => (
+                          <option key={c} value={c}>
+                            {c}
+                          </option>
+                        ))}
+                      </select>
+                    </label>
+                  </div>
+                  <Field
+                    label="Description"
+                    value={item.description}
+                    onChange={(v) => updateRealisation(index, { description: v })}
+                    textarea
+                  />
+                  <Field
+                    label="Résultat"
+                    value={item.resultat}
+                    onChange={(v) => updateRealisation(index, { resultat: v })}
+                    textarea
+                  />
+                  <ImageField
+                    label="Image principale"
+                    value={item.image}
+                    onChange={(v) => updateRealisation(index, { image: v })}
+                    altValue={item.imageAlt}
+                    onAltChange={(v) => updateRealisation(index, { imageAlt: v })}
+                  />
+                  <div className="grid md:grid-cols-2 gap-3">
+                    <ImageField
+                      label="Image AVANT (optionnel)"
+                      value={item.beforeImage ?? ""}
+                      onChange={(v) => updateRealisation(index, { beforeImage: v || undefined })}
+                    />
+                    <ImageField
+                      label="Image APRÈS (optionnel)"
+                      value={item.afterImage ?? ""}
+                      onChange={(v) => updateRealisation(index, { afterImage: v || undefined })}
+                    />
+                  </div>
+                </div>
+              ))}
+              <button
+                type="button"
+                className="text-blue-700 font-semibold"
+                onClick={() =>
+                  setContent({
+                    ...content,
+                    realisations: [
+                      ...content.realisations,
+                      {
+                        type: "",
+                        lieu: "",
+                        description: "",
+                        resultat: "",
+                        icon: "🔧",
+                        color: "blue",
+                        image: "",
+                        imageAlt: "",
+                      },
+                    ],
+                  })
+                }
+              >
+                + Ajouter une réalisation
+              </button>
+              <SaveButton label="Enregistrer — Réalisations" onSave={persistContent} />
             </>
           )}
 

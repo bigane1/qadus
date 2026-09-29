@@ -6,7 +6,7 @@ import Image from "next/image";
 import { TEL_DISPLAY, telHref, whatsappHref } from "@/lib/contact";
 import { navLinks, navServices } from "@/lib/navigation";
 
-export default function Header({ logoSrc = "/logo-round.png" }: { logoSrc?: string }) {
+export default function Header({ logoSrc = "/logo.png" }: { logoSrc?: string }) {
   const [scrolled, setScrolled] = useState(false);
   const [menuOpen, setMenuOpen] = useState(false);
   const [servicesOpen, setServicesOpen] = useState(false);
@@ -33,18 +33,17 @@ export default function Header({ logoSrc = "/logo-round.png" }: { logoSrc?: stri
     >
       <div className="max-w-7xl mx-auto px-4 sm:px-6">
         <div className="flex items-center justify-between h-16 lg:h-18">
-          <Link href="/" className="flex items-center gap-2.5 flex-shrink-0 min-w-0">
-            <span className="relative h-10 w-10 sm:h-11 sm:w-11 flex-shrink-0 overflow-hidden rounded-full bg-white/80 ring-1 ring-slate-200/70">
-              <Image
-                src={logoSrc}
-                alt="Qadus"
-                fill
-                className="object-contain p-1.5"
-                sizes="44px"
-                priority
-              />
-            </span>
-            <span className="font-black text-slate-800 text-lg tracking-tight truncate">Qadus</span>
+          <Link href="/" className="flex-shrink-0 min-w-0">
+            <Image
+              src={logoSrc}
+              alt="Qadus — plombier débouchage Poissy"
+              width={128}
+              height={128}
+              className="h-11 w-auto max-w-[min(42vw,9.5rem)] object-contain object-left bg-transparent"
+              sizes="(max-width: 640px) 42vw, 152px"
+              priority
+              unoptimized
+            />
           </Link>
 
           {/* Nav desktop */}

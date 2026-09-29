@@ -1,7 +1,15 @@
 import fs from "fs";
 import path from "path";
 import { defaultPrestations } from "@/lib/prestation-defaults";
+import {
+  defaultRealisations,
+  defaultRealisationsFooterNote,
+  defaultRealisationsSection,
+  type RealisationItem,
+} from "@/lib/realisations-defaults";
 import { heroImage, serviceImages } from "@/lib/images";
+
+export type { RealisationItem, RealisationColor } from "@/lib/realisations-defaults";
 
 export type TarifItem = {
   title: string;
@@ -124,6 +132,9 @@ export type SiteContent = {
   images: SiteImages;
   servicesSection: SectionHeading;
   tarifsSection: SectionHeading;
+  realisationsSection: SectionHeading;
+  realisationsFooterNote: string;
+  realisations: RealisationItem[];
 };
 
 const CONTENT_FILE = path.join(process.cwd(), "data", "site-content.json");
@@ -309,7 +320,7 @@ export const defaultSiteContent: SiteContent = {
     chemisageBeforeAlt: serviceImages.chemisageBefore.alt,
     chemisageAfter: serviceImages.chemisageAfter.src,
     chemisageAfterAlt: serviceImages.chemisageAfter.alt,
-    logo: "/logo-round.png",
+    logo: "/logo.png",
     footerImage1: "",
     footerImage1Alt: "",
     footerImage2: "",
@@ -327,6 +338,9 @@ export const defaultSiteContent: SiteContent = {
     subtitle:
       "Les tarifs ci-dessous sont des bases indicatives. Le prix exact est confirmé après diagnostic.",
   },
+  realisationsSection: defaultRealisationsSection,
+  realisationsFooterNote: defaultRealisationsFooterNote,
+  realisations: defaultRealisations,
 };
 
 export function mergeSiteContent(raw: Partial<SiteContent>): SiteContent {
@@ -337,7 +351,14 @@ export function mergeSiteContent(raw: Partial<SiteContent>): SiteContent {
     images: { ...defaultSiteContent.images, ...raw.images },
     servicesSection: { ...defaultSiteContent.servicesSection, ...raw.servicesSection },
     tarifsSection: { ...defaultSiteContent.tarifsSection, ...raw.tarifsSection },
+    realisationsSection: {
+      ...defaultSiteContent.realisationsSection,
+      ...raw.realisationsSection,
+    },
+    realisationsFooterNote:
+      raw.realisationsFooterNote ?? defaultSiteContent.realisationsFooterNote,
     tarifs: raw.tarifs?.length ? raw.tarifs : defaultSiteContent.tarifs,
+    realisations: raw.realisations?.length ? raw.realisations : defaultSiteContent.realisations,
     services: raw.services?.length ? raw.services : defaultSiteContent.services,
     prestations: raw.prestations?.length ? raw.prestations : defaultSiteContent.prestations,
     blog: raw.blog ?? defaultSiteContent.blog,
